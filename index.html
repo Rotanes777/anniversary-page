@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#08060f">
+<meta property="og:title" content="纪念日">
+<meta property="og:description" content="有些话，我攒了很久。">
+<meta property="og:image" content="cover.png">
+<meta name="apple-mobile-web-app-title" content="第 600 天">
+<title>纪念日</title>
+<style>
+:root{--pink:#ff9cbb;--pink-soft:#ffc7d9;--gold:#ffd9a0;--vh:100vh}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#08060f;color:#fff;
+ font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+ -webkit-font-smoothing:antialiased;overscroll-behavior:none}
+#stars,#fx{position:fixed;inset:0;width:100%;height:100%;z-index:20}
+#stars{z-index:0;pointer-events:none}#fx{z-index:9;pointer-events:none}
+#stage{position:relative;z-index:2;height:var(--vh);overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+section{height:var(--vh);scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;text-align:center;position:relative;
+ padding:calc(env(safe-area-inset-top) + 9vh) 8vw calc(env(safe-area-inset-bottom) + 9vh)}
+
+.rv{opacity:0;transform:translateY(26px);filter:blur(6px);
+ transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,.8,.2,1),filter 1.1s ease}
+.in .rv{opacity:1;transform:none;filter:none}
+.in .rv:nth-child(2){transition-delay:.2s}
+.in .rv:nth-child(3){transition-delay:.38s}
+.in .rv:nth-child(4){transition-delay:.56s}
+.in .rv:nth-child(5){transition-delay:.74s}
+
+.eyebrow{font-size:3.5vw;letter-spacing:.5em;text-indent:.5em;color:rgba(255,255,255,.5);margin-bottom:3vh}
+.bignum{font-size:clamp(84px,33vw,190px);line-height:.86;font-weight:200;letter-spacing:-.04em;
+ background:linear-gradient(170deg,#fff 8%,var(--pink-soft) 48%,var(--pink) 74%,#ff6f9c 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 34px rgba(255,120,165,.45));font-variant-numeric:tabular-nums}
+.unit{font-size:5.2vw;letter-spacing:.65em;text-indent:.65em;color:var(--pink);margin-top:1.6vh}
+.dates{margin-top:4.5vh;font-size:3.6vw;color:rgba(255,255,255,.45);letter-spacing:.14em}
+.hint{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 4.5vh);font-size:3.4vw;
+ color:rgba(255,255,255,.38);letter-spacing:.22em;animation:bob 2.2s ease-in-out infinite}
+.hint span{display:block;font-size:4.6vw;margin-top:.6vh;line-height:1}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(9px);opacity:.9}}
+
+.lead{font-size:4.2vw;color:rgba(255,255,255,.55);letter-spacing:.2em;margin-bottom:5vh}
+.grid{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:3.4vw}
+.cell{background:rgba(255,255,255,.045);border:.3px solid rgba(255,255,255,.1);border-radius:22px;
+ padding:4.4vw 2vw;backdrop-filter:blur(8px)}
+.cell .n{font-size:8.6vw;font-weight:300;font-variant-numeric:tabular-nums;
+ background:linear-gradient(180deg,#fff,var(--pink-soft));-webkit-background-clip:text;background-clip:text;
+ color:transparent;letter-spacing:-.01em}
+.cell .l{font-size:3vw;color:rgba(255,255,255,.42);letter-spacing:.28em;margin-top:1.2vh}
+
+.ttl{font-size:5.4vw;font-weight:300;letter-spacing:.3em;text-indent:.3em;margin-bottom:6vh}
+.tl{width:100%;max-width:520px;text-align:left;position:relative;padding-left:7vw}
+.tl::before{content:"";position:absolute;left:2.1vw;top:1.2vh;bottom:1.2vh;width:1px;
+ background:linear-gradient(180deg,transparent,var(--pink) 12%,var(--pink) 88%,transparent);opacity:.5}
+.ev{position:relative;padding-bottom:4.2vh}
+.ev:last-child{padding-bottom:0}
+.ev::before{content:"";position:absolute;left:-5.05vw;top:1vh;width:2.1vw;height:2.1vw;border-radius:50%;
+ background:var(--pink);box-shadow:0 0 14px var(--pink)}
+.ev .d{font-size:3.1vw;letter-spacing:.18em;color:var(--pink);opacity:.85}
+.ev .t{font-size:4.4vw;margin-top:.7vh;line-height:1.5;color:rgba(255,255,255,.94)}
+.ev .t em{font-style:normal;color:rgba(255,255,255,.5);font-size:3.6vw}
+
+/* 相册：卡片轮播 + 时间轴 */
+#s4{justify-content:center;overflow:hidden;
+ padding-top:calc(env(safe-area-inset-top) + 7vh);padding-bottom:4vh}
+#s4 .ttl{font-size:4.9vw;letter-spacing:.3em;margin-bottom:2.2vh}
+.deck{position:relative;width:100%;height:51vh;overflow:hidden;touch-action:pan-y}
+.album{position:absolute;inset:0}
+.shot{position:absolute;left:50%;top:2%;width:62vw;margin-left:-31vw;
+ border-radius:20px;overflow:hidden;border:.6px solid rgba(255,255,255,.16);background:#150e1e;
+ will-change:transform,opacity;box-shadow:0 14px 30px rgba(0,0,0,.45);cursor:pointer}
+.shot img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;contain:layout paint}
+.shot .cap{position:absolute;left:0;right:0;bottom:0;padding:8vw 3.4vw 2.8vw;
+ background:linear-gradient(transparent,rgba(0,0,0,.84));font-size:3.2vw;line-height:1.45;
+ color:#fff;letter-spacing:.03em}
+.shot.ph-only{display:flex;align-items:center;justify-content:center;flex-direction:column;
+ gap:1.4vh;color:rgba(255,255,255,.42);font-size:3vw;letter-spacing:.14em;
+ background:radial-gradient(120% 120% at 30% 20%,rgba(255,156,187,.2),transparent 60%),
+            radial-gradient(120% 120% at 80% 90%,rgba(255,217,160,.14),transparent 60%)}
+.shot.ph-only b{font-size:8vw;font-weight:400;opacity:.5}
+
+.tlwrap{position:relative;width:100%;height:11vh;overflow:hidden;margin-top:2.4vh}
+.tlwrap::before{content:"";position:absolute;left:0;right:0;top:calc(1.6vh + 3px);height:1px;
+ background:linear-gradient(90deg,transparent,rgba(255,156,187,.35) 18%,rgba(255,156,187,.35) 82%,transparent)}
+.tltrack{position:absolute;left:50%;top:0;height:100%;will-change:transform}
+.tlnode{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;
+ align-items:center;width:70px}
+.tlnode i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.26);
+ transition:transform .28s cubic-bezier(.2,.9,.2,1),background .28s,box-shadow .28s}
+.tlnode span{margin-top:1.4vh;font-size:2.5vw;color:rgba(255,255,255,.28);white-space:nowrap;
+ letter-spacing:.06em;transition:color .28s,font-size .28s}
+.tlnode.on i{background:var(--pink);box-shadow:0 0 12px var(--pink);transform:scale(1.7)}
+.tlnode.on span{color:var(--pink-soft);font-size:3.1vw}
+.albumtip{position:relative;z-index:400;font-size:2.9vw;color:rgba(255,255,255,.3);
+ letter-spacing:.16em;margin-top:1.2vh;text-align:center}
+#lb .lbcap{max-width:88vw}
+
+.letter{width:100%;max-width:560px;text-align:left;font-size:4.2vw;line-height:2.05;
+ color:rgba(255,255,255,.86)}
+.letter p{margin-bottom:2.4vh;opacity:0;transform:translateY(16px);transition:opacity .9s ease,transform .9s ease}
+.in .letter p{opacity:1;transform:none}
+.letter .hl{color:var(--pink-soft)}
+.sign{text-align:right;font-size:3.6vw;color:rgba(255,255,255,.5);letter-spacing:.14em}
+
+.ask{font-size:5.1vw;font-weight:300;line-height:1.62;white-space:pre-line}
+.ask b{color:var(--pink);font-weight:400}
+.btn{margin-top:7vh;padding:4.6vw 11vw;border-radius:999px;font-size:4.4vw;letter-spacing:.16em;
+ color:#2a0b18;font-weight:500;border:none;background:linear-gradient(135deg,#ffd6e3,#ff9cbb 55%,#ff85a8);
+ box-shadow:0 12px 40px rgba(255,120,165,.42),inset 0 1px 0 rgba(255,255,255,.7);
+ animation:pulse 2.4s ease-in-out infinite;transition:transform .18s}
+.btn:active{transform:scale(.94)}
+@keyframes pulse{0%,100%{box-shadow:0 12px 40px rgba(255,120,165,.36),inset 0 1px 0 rgba(255,255,255,.7)}
+ 50%{box-shadow:0 12px 58px rgba(255,120,165,.66),inset 0 1px 0 rgba(255,255,255,.7)}}
+
+.btnrow{display:flex;gap:3.6vw;margin-top:5vh;align-items:center;justify-content:center}
+.btn{margin-top:0}
+.btn2{padding:3.6vw 7vw;border-radius:999px;font-size:3.6vw;letter-spacing:.1em;
+ color:rgba(255,255,255,.52);background:rgba(255,255,255,.06);
+ border:.6px solid rgba(255,255,255,.16);font-family:inherit;
+ transition:transform .32s cubic-bezier(.2,.9,.2,1),opacity .3s}
+.btn.pressing{transform:scale(.95);filter:brightness(1.1);transition:transform .1s;
+ animation:glow 1.3s ease-out infinite}
+@keyframes glow{
+ 0%{box-shadow:0 0 0 0 rgba(255,140,175,.55),0 12px 40px rgba(255,120,165,.45)}
+ 70%{box-shadow:0 0 0 22px rgba(255,140,175,0),0 12px 40px rgba(255,120,165,.35)}
+ 100%{box-shadow:0 0 0 0 rgba(255,140,175,0),0 12px 40px rgba(255,120,165,.35)}
+}
+.btn2.dodged{z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:.85}
+.reply{margin-top:4vh;font-size:4vw;line-height:1.9;color:var(--pink-soft);min-height:8vh;
+ opacity:0;transition:opacity .8s;white-space:pre-line}
+.reply.on{opacity:1}
+
+#mute{position:fixed;top:calc(env(safe-area-inset-top) + 14px);right:16px;z-index:20;width:38px;height:38px;
+ border-radius:50%;border:.3px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);
+ backdrop-filter:blur(10px);color:#fff;font-size:16px;display:flex;align-items:center;
+ justify-content:center;transition:transform .2s}
+#mute:active{transform:scale(.9)}
+
+#intro{position:fixed;inset:0;z-index:40;background:#08060f;display:flex;align-items:center;
+ justify-content:center;flex-direction:column;transition:opacity 1.1s,visibility 1.1s}
+#intro.gone{opacity:0;visibility:hidden}
+#intro .heart{width:22vw;height:22vw;animation:beat 1.5s ease-in-out infinite}
+#intro .heart svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(255,120,165,.6))}
+#intro .ver{margin-top:2.4vh;font-size:2.6vw;letter-spacing:.3em;color:rgba(255,255,255,.16)}
+#intro .tip{margin-top:5vh;font-size:3.4vw;letter-spacing:.3em;color:rgba(255,255,255,.45)}
+.tapgate{position:absolute;inset:0;z-index:41}
+@keyframes beat{0%,100%{transform:scale(1)}14%{transform:scale(1.16)}28%{transform:scale(1)}
+ 42%{transform:scale(1.12)}56%{transform:scale(1)}}
+
+
+/* ============ 城市地图 ============ */
+.mapwrap{width:100%;margin:1vh 0 3vh;position:relative}
+#cnmap{width:100%;height:auto;display:block;overflow:visible;
+ transform-origin:50% 50%;will-change:transform;backface-visibility:hidden}
+#mzReset{position:absolute;right:2px;top:2px;z-index:5;opacity:0;pointer-events:none;
+ transform:translateY(-4px);transition:opacity .25s,transform .25s;
+ background:rgba(20,14,28,.82);border:.5px solid rgba(255,156,187,.45);color:var(--pink-soft);
+ font-size:2.8vw;padding:1.6vw 3.2vw;border-radius:999px;font-family:inherit}
+#mzReset.on{opacity:1;pointer-events:auto;transform:none}
+#cnmap.mz-anim{transition:transform .3s cubic-bezier(.2,.9,.2,1)}
+.mapwrap{overflow:hidden;touch-action:pan-y;border-radius:16px;
+ background:
+   radial-gradient(58% 58% at 50% 46%, rgba(255,120,165,.075), transparent 72%),
+   radial-gradient(120% 120% at 50% 50%, #0e0a18 0%, #08060f 70%)}
+#mapProv path{fill:rgba(255,255,255,.05);stroke:rgba(255,156,187,.3);stroke-width:.8;vector-effect:non-scaling-stroke;
+ stroke-linejoin:round;stroke-linecap:round}
+.dot{cursor:pointer}
+.dot .core{fill:#ff9cbb;stroke:#ffe6ef;stroke-width:1.6}
+.dot .halo{fill:rgba(255,120,165,.45);transform-box:fill-box;transform-origin:center;
+ animation:halo 2.6s ease-out infinite}
+.dot.a1 .halo{animation-delay:.7s}
+.dot.a2 .halo{animation-delay:1.4s}
+.dot.a3 .halo{animation-delay:2.1s}
+.dot .hit{fill:transparent}
+@keyframes halo{0%{transform:scale(.6);opacity:.85}100%{transform:scale(3.8);opacity:0}}
+.citylist{width:100%;display:flex;flex-wrap:wrap;gap:2.4vw;justify-content:center}
+.citychip{display:flex;align-items:center;gap:1.6vw;padding:2.6vw 3.6vw;border-radius:999px;
+ background:rgba(255,156,187,.1);border:.4px solid rgba(255,156,187,.35);font-size:3.4vw}
+.citychip b{font-weight:400;color:#fff}
+.citychip i{font-style:normal;color:var(--pink);font-size:3vw;opacity:.85}
+.maphint{margin-top:3.4vh;font-size:3.2vw;color:rgba(255,255,255,.34);letter-spacing:.16em}
+
+#lb{position:fixed;inset:0;z-index:70;display:flex;
+ flex-direction:column;padding:calc(env(safe-area-inset-top) + 14px) 0 calc(env(safe-area-inset-bottom) + 16px)}
+#lb .lbbar{display:flex;align-items:center;justify-content:space-between;padding:0 6vw 2vh}
+#lb .lbbar b{font-size:4.4vw;font-weight:400;letter-spacing:.16em;color:#fff}
+#lb .lbbar button{background:rgba(255,255,255,.1);border:.4px solid rgba(255,255,255,.22);
+ color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;font-family:inherit}
+#lb .lbwrap{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+ -webkit-overflow-scrolling:touch;scrollbar-width:none}
+#lb .lbwrap::-webkit-scrollbar{display:none}
+#lb .lbslide{flex:0 0 100%;scroll-snap-align:center;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;padding:0 6vw}
+#lb .lbslide img{max-width:100%;max-height:64vh;border-radius:18px;object-fit:contain;
+ border:.4px solid rgba(255,255,255,.14)}
+#lb .lbcap{margin-top:3vh;font-size:3.8vw;line-height:1.8;color:rgba(255,255,255,.75);
+ text-align:center;letter-spacing:.06em}
+#lb .lbempty{color:rgba(255,255,255,.5);font-size:3.8vw;letter-spacing:.16em;text-align:center;line-height:2.1}
+
+
+/* 地图镜头推进 */
+#scity{overflow:hidden}
+#scity .mapwrap{transform-origin:50% 50%;will-change:transform;
+ transition:transform .72s cubic-bezier(.22,.85,.2,1),opacity .55s ease,filter .7s ease}
+#scity .mapwrap.zoom{opacity:.42;filter:blur(1.8px) brightness(.7)}
+.dot.active .core{fill:#fff}
+.mapwrap.zoom .dot .halo{animation-duration:1.1s}
+#lb{background:rgba(6,4,10,0);opacity:0;pointer-events:none;
+ transition:background .5s ease,opacity .38s ease;
+ -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px)}
+#lb.on{background:rgba(6,4,10,.74);opacity:1;pointer-events:auto;
+ -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+#lb .lbbar,#lb .lbwrap{transition:opacity .1s}
+#lb .lbslide img{transform:scale(.9);opacity:0;
+ transition:transform .6s cubic-bezier(.2,.9,.2,1) .06s,opacity .45s ease .06s}
+#lb.on .lbslide img{transform:scale(1);opacity:1}
+#lb .lbcap{opacity:0;transform:translateY(8px);transition:opacity .5s ease .18s,transform .5s ease .18s}
+#lb.on .lbcap{opacity:1;transform:none}
+#lb .lbempty{opacity:0;transform:scale(.92);transition:opacity .5s ease .1s,transform .5s ease .1s}
+#lb.on .lbempty{opacity:1;transform:none}
+
+
+#tlbox{position:fixed;inset:0;z-index:80;background:rgba(6,4,10,.96);display:none;
+ flex-direction:column;padding:calc(env(safe-area-inset-top) + 18px) 5vw calc(env(safe-area-inset-bottom) + 20px)}
+#tlbox.on{display:flex}
+#tlbox .tb{display:flex;align-items:center;justify-content:space-between;margin-bottom:3vh}
+#tlbox .tb b{font-size:4.2vw;font-weight:400;letter-spacing:.1em}
+#tlbox .tb button{background:rgba(255,255,255,.1);border:.4px solid rgba(255,255,255,.22);
+ color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;font-family:inherit}
+#tlbox textarea{flex:1;width:100%;background:rgba(255,255,255,.06);border:.4px solid rgba(255,255,255,.16);
+ border-radius:14px;color:#fff;padding:3.4vw;font-size:3.6vw;line-height:1.9;font-family:inherit;resize:none;outline:none}
+#tlbox .cp{margin-top:3vh;padding:4vw;border-radius:14px;border:none;
+ background:linear-gradient(135deg,#ffd6e3,#ff9cbb);color:#2a0b18;font-size:4.2vw;font-family:inherit;font-weight:500}
+#tlbox .hint{font-size:3.2vw;color:rgba(255,255,255,.4);margin-top:2vh;line-height:1.7}
+
+
+#film{position:fixed;left:0;right:0;top:50%;margin-top:-6vh;height:12vh;z-index:15;
+ opacity:0;pointer-events:none;overflow:hidden;transform:translate3d(106%,0,0);
+ transition:opacity .45s ease;will-change:transform;
+ -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+ mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+ background:linear-gradient(180deg,transparent,rgba(10,6,16,.62) 20%,rgba(10,6,16,.62) 80%,transparent)}
+#film.on{opacity:1}
+#film.flash{filter:brightness(1.55)}
+#film::before,#film::after{content:"";position:absolute;left:0;right:0;height:9px;z-index:2;
+ background-image:radial-gradient(circle,rgba(255,255,255,.4) 2px,transparent 2.4px);
+ background-size:18px 9px;background-repeat:repeat-x}
+#film::before{top:1px}
+#film::after{bottom:1px}
+.film-track{display:flex;gap:9px;height:100%;padding:9px 0;will-change:transform;
+ transform:translate3d(0,0,0)}
+.film-track img{height:100%;width:auto;border-radius:5px;object-fit:cover;
+ box-shadow:0 6px 18px rgba(0,0,0,.55);border:.5px solid rgba(255,255,255,.18)}
+
+/* ---- 查看器：一次一张 ---- */
+#lb .lbwrap{flex:1;overflow:hidden;display:block;position:relative}
+#lb .lbtrack{display:flex;height:100%;will-change:transform;
+ transition:transform .32s cubic-bezier(.2,.9,.2,1)}
+#lb .lbslide{flex:0 0 100%;display:flex;flex-direction:column;align-items:center;
+ justify-content:center;padding:0 6vw;scroll-snap-align:none}
+#lb .lbslide img{max-width:100%;max-height:58vh;min-height:20vh;transform:scale(.94);opacity:.55;
+ transition:transform .35s ease,opacity .35s ease}
+#lb.on .lbslide.near img{transform:scale(1);opacity:1}
+#lb.on .lbslide img{transform:scale(.94);opacity:.55}
+#lb .lbSub,#lb .lbsub{font-size:3.4vw;color:var(--pink-soft);text-align:center;
+ padding:0 9vw 1.4vh;line-height:1.65;letter-spacing:.04em}
+#lb .lbcount{text-align:center;font-size:3vw;color:rgba(255,255,255,.35);
+ letter-spacing:.24em;padding-top:1.4vh}
+
+#filmBtnWrap{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 9vh);
+ z-index:18;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+ transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+#filmBtnWrap.on{opacity:1;pointer-events:auto;transform:none}
+#filmBtn{padding:4vw 9vw;border-radius:999px;font-size:4vw;letter-spacing:.18em;
+ color:#2a0b18;font-weight:500;font-family:inherit;border:none;
+ background:linear-gradient(135deg,#ffe1ec,#ffb3cb 55%,#ff96b4);
+ box-shadow:0 10px 34px rgba(255,120,165,.42),inset 0 1px 0 rgba(255,255,255,.75);
+ animation:filmPulse 2.4s ease-in-out infinite}
+.filmhint{margin-top:1.8vh;font-size:3vw;letter-spacing:.16em;
+ color:rgba(255,255,255,.4);text-align:center}
+#filmBtn.pressing{transform:scale(.95);filter:brightness(1.12)}
+@keyframes filmPulse{0%,100%{box-shadow:0 10px 30px rgba(255,120,165,.38),inset 0 1px 0 rgba(255,255,255,.75)}
+ 50%{box-shadow:0 10px 46px rgba(255,120,165,.66),inset 0 1px 0 rgba(255,255,255,.75)}}
+
+/* ---- 拍立得相纸 ---- */
+.shot{background:transparent!important;border:none!important;box-shadow:none!important;
+ overflow:visible!important;border-radius:0!important}
+.shot .polaroid{width:100%;background:#fbf8f2;padding:2.6vw 2.6vw 12vw;
+ border-radius:4px;box-shadow:0 14px 30px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.3);
+ transition:transform .4s ease;will-change:transform}
+.shot .polaroid img{width:100%;height:auto;min-height:58vw;object-fit:cover;display:block;
+ border-radius:1px;background:#2a2233}
+@supports (aspect-ratio: 4/5){
+ .shot .polaroid img{aspect-ratio:4/5;min-height:0}
+}
+.shot .pwhen{position:absolute;left:0;right:0;bottom:7.2vw;text-align:center;
+ font-size:2.9vw;color:#a08a97;font-style:italic;letter-spacing:.1em}
+.shot .pdate{position:absolute;left:0;right:0;bottom:2.4vw;text-align:center;
+ font-size:3.3vw;color:#4a3944;font-style:italic;letter-spacing:.04em;padding:0 2vw;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ font-family:"PingFang SC","Noto Serif SC",Georgia,serif}
+.shot .pcap{position:absolute;left:0;right:0;bottom:2.2vw;text-align:center;
+ font-size:3.2vw;color:#6b5560;padding:0 2vw;white-space:nowrap;overflow:hidden;
+ text-overflow:ellipsis;font-style:italic}
+.shot .polaroid{position:relative}
+
+/* ---- 未来的信封 ---- */
+#envWrap{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 5vh);
+ z-index:19;display:flex;flex-direction:column;align-items:center;
+ opacity:0;pointer-events:none;transform:translateY(16px);
+ transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1)}
+#envWrap.on{opacity:1;pointer-events:auto;transform:none}
+#envWrap.on .env:not(.open){animation:wiggle 3.2s ease-in-out infinite}
+@keyframes wiggle{
+ 0%,66%,100%{transform:rotate(0) translateY(0)}
+ 70%{transform:rotate(-3.5deg) translateY(-2px)}
+ 74%{transform:rotate(3.5deg) translateY(0)}
+ 78%{transform:rotate(-2.5deg) translateY(-1px)}
+ 82%{transform:rotate(2deg) translateY(0)}
+ 86%{transform:rotate(-1deg)}
+ 90%{transform:rotate(0)}
+}
+.env-tap{margin-top:1.6vh;font-size:2.9vw;color:rgba(255,156,187,.75);
+ letter-spacing:.18em;animation:tapPulse 2.6s ease-in-out infinite}
+@keyframes tapPulse{0%,100%{opacity:.45}50%{opacity:.95}}
+.env{width:34vw;height:22vw;position:relative;cursor:pointer;
+ filter:drop-shadow(0 12px 26px rgba(0,0,0,.55))}
+.env-back{position:absolute;inset:0;border-radius:4px;
+ background:linear-gradient(160deg,#f8ebf1,#efd7e1)}
+.env-flap{position:absolute;left:0;right:0;top:0;height:54%;
+ background:linear-gradient(180deg,#fdf4f8,#f3e0e9);
+ clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;
+ transition:transform .55s cubic-bezier(.3,.9,.3,1);z-index:2}
+.env.open .env-flap{transform:rotateX(-178deg)}
+.env-seal{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+ width:7.4vw;height:7.4vw;border-radius:50%;background:#ff9cc0;color:#fff;
+ display:flex;align-items:center;justify-content:center;font-size:3.6vw;z-index:3;
+ box-shadow:0 3px 10px rgba(255,120,165,.55);transition:opacity .35s,transform .35s}
+.env.open .env-seal{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+.env-note{position:fixed;left:50%;top:50%;width:80vw;z-index:30;background:#fbf8f2;
+ border-radius:12px;padding:5vw 5vw 4.4vw;opacity:0;
+ transform:translate(-50%,-46%) scale(.9);pointer-events:none;
+ transition:opacity .45s ease,transform .45s cubic-bezier(.2,.9,.2,1);
+ box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.env-note.on{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+.en-title{font-size:4vw;color:#3f2f39;letter-spacing:.1em;margin-bottom:2.6vw;
+ font-style:italic;font-family:"PingFang SC",Georgia,serif}
+#envInput{width:100%;background:transparent;border:none;border-bottom:1px dashed #c9aebb;
+ color:#3f2f39;font-size:4.4vw;font-family:inherit;padding:1.6vw 0;outline:none;letter-spacing:.06em}
+#envInput::placeholder{color:#c2a9b6}
+#envDone{display:block;width:100%;margin-top:3.4vw;padding:2.8vw;border-radius:10px;border:none;
+ background:linear-gradient(135deg,#ffd6e3,#ff9cbb);color:#2a0b18;font-size:3.6vw;
+ font-family:inherit;letter-spacing:.12em;font-weight:500}
+.en-hint{margin-top:2.4vw;font-size:3vw;color:#a08b98;letter-spacing:.08em}
+
+#s7.locked{display:none}
+/* ---- THE END 屏 ---- */
+#s7{background:#08060f;overflow:hidden}
+#s7 .end-glow{position:absolute;inset:0;pointer-events:none;
+ background:
+  radial-gradient(46% 32% at 50% 34%, rgba(255,140,180,.13), transparent 70%),
+  radial-gradient(70% 46% at 50% 78%, rgba(255,190,140,.06), transparent 72%)}
+#s7 .end-star{position:relative;font-size:4.6vw;color:var(--pink);opacity:0;
+ transform:translateY(8px);transition:opacity 1s .2s,transform 1s .2s;
+ animation:twinkle 3.6s ease-in-out infinite 1.4s}
+#s7.in .end-star{opacity:.85;transform:none}
+@keyframes twinkle{0%,100%{opacity:.85}50%{opacity:.35}}
+#s7 .end-mark{position:relative;margin-top:3.4vh;font-size:8.2vw;font-weight:200;
+ letter-spacing:.46em;text-indent:.46em;
+ background:linear-gradient(100deg,#fff 8%,#ffd9e6 42%,#ffb6cf 62%,#fff 92%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ opacity:0;transform:translateY(14px);transition:opacity 1.4s .5s,transform 1.4s .5s}
+#s7.in .end-mark{opacity:1;transform:none}
+#s7 .end-rule{position:relative;width:0;height:1px;margin-top:4.2vh;
+ background:linear-gradient(90deg,transparent,rgba(255,156,187,.55),transparent);
+ transition:width 1.2s .9s ease}
+#s7.in .end-rule{width:52vw}
+#s7 .end-next{position:relative;margin-top:5vh;font-size:3.7vw;color:rgba(255,255,255,.5);
+ min-height:7vh;letter-spacing:.12em;text-align:center;padding:0 9vw;line-height:2;
+ opacity:0;transform:translateY(10px);transition:opacity 1.1s 1.3s,transform 1.1s 1.3s}
+#s7.in .end-next{opacity:1;transform:none}
+#s7 .end-next b{display:inline-block;margin-top:1.4vh;font-size:5.6vw;font-weight:300;
+ color:#fff;letter-spacing:.16em;font-style:italic;
+ border-bottom:1px solid rgba(255,156,187,.45);padding:0 .4em .3vh}
+#s7 .end-heart{position:relative;margin-top:4.6vh;font-size:4.4vw;
+ color:rgba(255,140,175,.5);opacity:0;transition:opacity 1s 1.9s}
+#s7.in .end-heart{opacity:1;animation:beat 2.6s ease-in-out infinite 2.4s}
+#s7 .end-line{position:relative;margin-top:4.4vh;font-size:3.8vw;color:rgba(255,214,229,.72);
+ letter-spacing:.14em;text-align:center;padding:0 10vw;line-height:1.9;
+ opacity:0;transform:translateY(10px);transition:opacity 1.1s 1.1s,transform 1.1s 1.1s}
+#s7.in .end-line{opacity:1;transform:none}
+#s7 .end-heart{font-size:5.2vw;
+ filter:drop-shadow(0 0 10px rgba(255,120,170,.75)) drop-shadow(0 0 22px rgba(255,120,170,.4))}
+#s7 .end-mark{filter:drop-shadow(0 0 18px rgba(255,150,190,.35))}
+#s7 .end-glow{animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1.15;transform:scale(1.06)}}
+#s7 .end-tip{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 5vh);
+ font-size:3vw;color:rgba(255,255,255,.28);letter-spacing:.2em;
+ opacity:0;transition:opacity 1s 2.6s}
+#s7.in .end-tip{opacity:1}
+
+/* 信封飞走 */
+.env.flying{transform:translateY(-68vh) scale(.14) rotate(-10deg);opacity:0;
+ transition:transform 1.1s cubic-bezier(.5,0,.9,.42),opacity .95s ease .15s}
+#envWrap.revealed{opacity:0;pointer-events:none}
+.locktip{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 2.4vh);
+ text-align:center;font-size:3vw;color:rgba(255,156,187,.62);letter-spacing:.16em;
+ animation:tapPulse 3s ease-in-out infinite;display:none}
+.locktip.on{display:block}
+.offscreen{opacity:0!important;pointer-events:none!important;transition:opacity .3s ease!important}
+
+/* ---- 时间锁 ---- */
+#gate{position:fixed;inset:0;z-index:120;background:#08060f;display:flex;
+ flex-direction:column;align-items:center;justify-content:center;
+ transition:opacity .9s ease,visibility .9s;overflow:hidden}
+#gate.gone{opacity:0;visibility:hidden;pointer-events:none}
+#gate::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(46% 34% at 50% 42%,rgba(255,140,180,.13),transparent 72%)}
+#gate .gate-heart{position:relative;font-size:9vw;color:#ff9cbb;
+ filter:drop-shadow(0 0 18px rgba(255,120,170,.7));
+ animation:beat 2.6s ease-in-out infinite}
+#gate .gate-label{position:relative;margin-top:6vh;font-size:3.4vw;
+ letter-spacing:.4em;text-indent:.4em;color:rgba(255,255,255,.4)}
+#gate .gate-time{position:relative;margin-top:2.6vh;font-size:11vw;font-weight:200;
+ letter-spacing:.08em;font-variant-numeric:tabular-nums;
+ background:linear-gradient(180deg,#fff,#ffc7d9 62%,#ff9cbb);
+ -webkit-background-clip:text;background-clip:text;color:transparent}
+#gate .gate-sub{position:relative;margin-top:4.4vh;font-size:3.4vw;
+ color:rgba(255,255,255,.45);letter-spacing:.2em}
+#gate .gate-fine{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 6vh);
+ font-size:2.9vw;color:rgba(255,255,255,.2);letter-spacing:.24em}
+/* ============ 编辑面板 ============ */
+#editor{position:fixed;inset:0;z-index:60;background:#0b0817;display:none;overflow-y:auto;
+ -webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 16px) 5vw
+ calc(env(safe-area-inset-bottom) + 40px)}
+#editor.on{display:block}
+#editor h3{font-size:3.6vw;font-weight:400;letter-spacing:.24em;color:var(--pink);
+ margin:6vw 0 3vw;padding-bottom:2vw;border-bottom:.4px solid rgba(255,156,187,.25)}
+#editor h3:first-child{margin-top:0}
+.ebar{display:flex;align-items:center;justify-content:space-between;margin-bottom:5vw}
+.ebar b{font-size:4.4vw;font-weight:400;letter-spacing:.1em}
+.ebar button{background:rgba(255,255,255,.1);border:.4px solid rgba(255,255,255,.2);color:#fff;
+ font-size:3.6vw;padding:2.4vw 5vw;border-radius:999px;font-family:inherit}
+.field{margin-bottom:3.6vw}
+.field label{display:block;font-size:3.2vw;color:rgba(255,255,255,.55);margin-bottom:1.4vw;letter-spacing:.1em}
+.field input,.field textarea{width:100%;background:rgba(255,255,255,.06);
+ border:.4px solid rgba(255,255,255,.14);border-radius:14px;color:#fff;padding:3.2vw 3.4vw;
+ font-size:4vw;font-family:inherit;line-height:1.6;outline:none;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--pink);background:rgba(255,156,187,.08)}
+.field textarea{min-height:26vw}
+.row{display:flex;gap:3vw}
+.row .field{flex:1}
+.item{border:.4px solid rgba(255,255,255,.13);border-radius:16px;padding:3.6vw;margin-bottom:3.4vw;
+ background:rgba(255,255,255,.03)}
+.item .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.4vw}
+.item .top span{font-size:3.2vw;color:rgba(255,255,255,.45);letter-spacing:.14em}
+.item .top .del{background:rgba(255,90,120,.18);border:.4px solid rgba(255,90,120,.4);
+ color:#ff8fa3;font-size:3.2vw;padding:1.6vw 3.4vw;border-radius:999px;font-family:inherit}
+.add{width:100%;padding:3.6vw;border-radius:14px;border:.6px dashed rgba(255,156,187,.5);
+ background:rgba(255,156,187,.07);color:var(--pink);font-size:3.8vw;font-family:inherit;letter-spacing:.1em}
+.thumbs{display:grid;grid-template-columns:1fr 1fr;gap:3vw;margin-bottom:3.4vw}
+.th{border-radius:14px;overflow:hidden;position:relative;border:.4px solid rgba(255,255,255,.14)}
+.th img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.th .del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:none;
+ background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:26px;text-align:center;font-family:inherit}
+.th .thwhen{top:6px;left:6px;right:auto;width:auto;padding:1.2vw 2.6vw;border-radius:8px;
+ font-size:2.7vw;background:rgba(0,0,0,.55);border:.4px solid rgba(255,156,187,.45);color:var(--pink-soft)}
+.thbar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:1.2vw;
+ padding:1.4vw 1.6vw;background:rgba(0,0,0,.66)}
+.thbar .nte{flex:1;font-size:2.7vw;color:rgba(255,255,255,.75);white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}
+.thbar .mv{flex:0 0 auto;background:rgba(255,156,187,.2);border:.4px solid rgba(255,156,187,.4);
+ color:#fff;font-family:inherit;font-size:3.2vw;line-height:1;padding:1.4vw 2.8vw;border-radius:7px}
+.thbar .mv:disabled{opacity:.22}
+.thbar .mv:active{background:rgba(255,156,187,.45)}
+.ebtns{display:flex;flex-direction:column;gap:3.4vw;margin-top:8vw}
+.ebtns button{width:100%;padding:4.4vw;border-radius:16px;font-size:4.2vw;font-family:inherit;
+ border:none;letter-spacing:.1em}
+.bSave{background:linear-gradient(135deg,#ffd6e3,#ff9cbb);color:#2a0b18;font-weight:500}
+.bExp{background:rgba(255,255,255,.1);color:#fff;border:.4px solid rgba(255,255,255,.22)!important}
+.bReset{background:none;color:rgba(255,255,255,.4);font-size:3.4vw!important}
+.tipx{font-size:3.1vw;line-height:1.8;color:rgba(255,255,255,.4);margin-top:3vw}
+#toast{position:fixed;left:50%;bottom:12vh;transform:translate(-50%,20px);z-index:90;
+ background:rgba(30,20,40,.95);border:.4px solid rgba(255,156,187,.4);color:#fff;
+ padding:3.4vw 6vw;border-radius:999px;font-size:3.6vw;opacity:0;pointer-events:none;
+ transition:opacity .3s,transform .3s;white-space:nowrap;max-width:86vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-heart">❤</div>
+  <div class="gate-label">还有</div>
+  <div class="gate-time" id="gateTime">-- : -- : --</div>
+  <div class="gate-sub" id="gateSub">到那天零点，自己打开</div>
+  <div class="gate-fine">这一天，我准备了很久</div>
+</div>
+
+<canvas id="stars"></canvas>
+<canvas id="fx"></canvas>
+
+<audio id="bgm" loop playsinline preload="auto">
+  <source src="music/bgm.mp3" type="audio/mpeg">
+</audio>
+
+<div id="intro">
+  <div class="heart">
+    <svg viewBox="0 0 32 29"><path fill="url(#g)" d="M16 28.5S1 19.6 1 10.2C1 4.9 5.2 1 9.9 1c2.9 0 5 1.7 6.1 3.4C17.1 2.7 19.2 1 22.1 1 26.8 1 31 4.9 31 10.2c0 9.4-15 18.3-15 18.3z"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd6e3"/><stop offset="1" stop-color="#ff6f9c"/></linearGradient></defs></svg>
+  </div>
+  <div class="tip" id="introTip">我攒了很久的话</div>
+  <div class="ver">v2</div>
+  <div class="tapgate" id="tapgate"></div>
+</div>
+
+<button id="mute" aria-label="music">♪</button>
+
+<div id="stage">
+  <section id="s1">
+    <div class="eyebrow rv" id="eyebrow">OUR DAYS</div>
+    <div class="bignum rv" id="bigNum">0</div>
+    <div class="unit rv" id="unitText">天</div>
+    <div class="dates rv" id="dates"></div>
+    <div class="hint">往下滑<span>⌄</span></div>
+  </section>
+
+  <section id="s2">
+    <div class="lead rv" id="leadText">我们已经在一起</div>
+    <div class="grid rv">
+      <div class="cell"><div class="n" id="cDay">0</div><div class="l">天</div></div>
+      <div class="cell"><div class="n" id="cHour">0</div><div class="l">小时</div></div>
+      <div class="cell"><div class="n" id="cMin">0</div><div class="l">分钟</div></div>
+      <div class="cell"><div class="n" id="cSec">0</div><div class="l">秒</div></div>
+    </div>
+    <div class="lead rv" id="addText" style="margin:6vh 0 0;font-size:3.6vw">而且还在往上加</div>
+  </section>
+
+  <section id="s3">
+    <div class="ttl rv" id="tlTitle">这一路</div>
+    <div class="tl" id="tl"></div>
+  </section>
+
+  <section id="s4">
+    <div class="ttl rv" id="albumTitle">关于我们</div>
+    <div class="deck" id="deck"><div class="album" id="album"></div></div>
+    <div class="tlwrap" id="tlWrap"><div class="tltrack" id="tlTrack"></div></div>
+    <div class="albumtip" id="albumTip"></div>
+  </section>
+
+  <section id="scity">
+    <div class="ttl rv" id="cityTitle">我们去过的地方</div>
+    <div class="mapwrap rv">
+      <button id="mzReset">还原</button>
+      <svg id="cnmap" viewBox="0 0 626 441" preserveAspectRatio="xMidYMid meet">
+        <g id="mapProv"></g>
+        <g id="mapDots"></g>
+      </svg>
+    </div>
+    <div class="citylist" id="cityList"></div>
+    <div class="maphint rv" id="mapHint">点一下城市，看那天的照片</div>
+  </section>
+
+  <section id="s5">
+    <div class="letter" id="letter"></div>
+  </section>
+
+  <section id="s6">
+    <div class="ask rv" id="askText"></div>
+    <div class="btnrow rv">
+      <button class="btn" id="yes">要 ❤️</button>
+      <button class="btn2" id="no">不要 💔</button>
+    </div>
+    <div class="reply" id="reply"></div>
+    <div class="locktip" id="lockTip">先点上面的信封 · 写下下一站才能继续</div>
+  </section>
+
+  <!-- THE END -->
+  <section id="s7" class="locked">
+    <div class="end-glow"></div>
+    <div class="end-star">✦</div>
+    <div class="end-mark">THE&nbsp;&nbsp;END</div>
+    <div class="end-rule"></div>
+    <div class="end-line" id="endLine">故事还长，只是一个逗号。</div>
+    <div class="end-next" id="endNext"></div>
+    <div class="end-heart">❤</div>
+    <div class="end-tip">往上滑可以再看一遍</div>
+  </section>
+</div>
+
+<div id="lb">
+  <div class="lbbar"><b id="lbTitle"></b><button id="lbClose">×</button></div>
+  <div class="lbsub" id="lbSub"></div>
+  <div class="lbwrap"><div class="lbtrack" id="lbShots"></div></div>
+  <div class="lbcount" id="lbCount"></div>
+</div>
+
+<div id="tlbox">
+  <div class="tb"><b>时间清单</b><button id="tlboxClose">×</button></div>
+  <textarea id="tlboxText" readonly></textarea>
+  <button class="cp" id="tlboxCopy">复制这段文字发给我</button>
+  <div class="hint">左边是照片编号（p01~p45），右边是你填的时间。空着的就是还没填。</div>
+</div>
+
+<div id="film"><div class="film-track" id="filmTrack"></div></div>
+
+<div id="filmBtnWrap"><button id="filmBtn">按住我</button><div class="filmhint">按住，看看我们去过的地方</div></div>
+
+<div id="envWrap">
+  <div class="env" id="env">
+    <div class="env-back"></div>
+    <div class="env-flap"></div>
+    <div class="env-seal">♥</div>
+  </div>
+  <div class="env-tap" id="envTap">点开，写一句</div>
+  <div class="env-note" id="envNote">
+    <div class="en-title">下一次，我们去看</div>
+    <input id="envInput" placeholder="写在这里…" maxlength="24">
+    <button id="envDone">写好了，封起来</button>
+    <div class="en-hint" id="envSaved">点开信封，写下下一站</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ============ 编辑器 ============ -->
+<div id="editor">
+  <div class="ebar">
+    <b>编辑模式</b>
+    <button id="eClose">关闭</button>
+  </div>
+
+  <h3>基本</h3>
+  <div class="row">
+    <div class="field"><label>在一起的日期（第 1 天）</label><input type="date" id="fStart"></div>
+    <div class="field"><label>大数字显示</label><input type="number" id="fTarget"></div>
+  </div>
+  <div class="field"><label>小标题（第 1 屏上方）</label><input id="fEyebrow"></div>
+  <div class="field"><label>开场那句话</label><input id="fIntroTip"></div>
+  <div class="field"><label>时间线标题</label><input id="fTlTitle"></div>
+  <div class="field"><label>相册标题</label><input id="fAlbumTitle"></div>
+  <div class="field"><label>第二页引导语</label><input id="fLeadText"></div>
+  <div class="field"><label>「而且还在往上加」那句</label><input id="fAddText"></div>
+  <div class="field"><label>天数单位（默认「天」）</label><input id="fUnitText"></div>
+  <div class="field"><label>地图页标题</label><input id="fCityTitle"></div>
+  <div class="field"><label>地图页提示语</label><input id="fMapHint"></div>
+  <div class="row">
+    <div class="field"><label>THE END 下面那句话</label><input id="fEnding"></div>
+    <div class="field"><label>「要」按钮文字</label><input id="fYesText"></div>
+    <div class="field"><label>「不要」按钮文字</label><input id="fNoText"></div>
+  </div>
+
+  <h3>时间线</h3>
+  <div id="eTl"></div>
+  <button class="add" id="addTl">+ 加一条</button>
+
+  <h3>走过的城市</h3>
+  <div class="field"><input id="citySearch" placeholder="输入城市名筛选，如 杭州"></div>
+  <div class="citypick" id="cityPick" style="display:flex;flex-wrap:wrap;gap:2.4vw;margin-bottom:3vw"></div>
+  <div id="eCities"></div>
+  <input type="file" id="cityFile" accept="image/*" multiple style="display:none">
+  <div class="tipx">地图上的点是去过的城市。城市卡片点「+照片」加照片，点「配文」写一句话，她会点地图上的点来看。</div>
+
+  <h3>照片</h3>
+  <div class="thumbs" id="eThumbs"></div>
+  <button class="add" id="addPhoto">+ 从相册选照片（可多选）</button>
+  <button class="add" id="eTimeList" style="margin-top:2vw">导出时间清单（复制发我）</button>
+  <button class="add" id="eAllText" style="margin-top:2vw">导出全部文字（复制发我）</button>
+  <button class="add" id="eExportAll" style="margin-top:2vw">导出全部数据（复制发我·最完整）</button>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+  <div class="tipx">照片会自动压到 900px 宽，一张大约 100KB。建议放 4～10 张，竖图效果最好。</div>
+
+  <h3>放映机图片</h3>
+  <div class="thumbs" id="eFilm"></div>
+  <button class="add" id="addFilm">+ 加入放映照片</button>
+  <input type="file" id="filmInput" accept="image/*" multiple style="display:none">
+  <div class="tipx">放映时每次从这里随机抽 20 张。留空就用「回忆」里的照片。</div>
+
+  <h3>情书</h3>
+  <div class="field"><label>正文（一行 = 一段）</label><textarea id="fLetter" style="min-height:50vw"></textarea></div>
+  <div class="field"><label>落款</label><input id="fSign"></div>
+
+  <h3>结尾</h3>
+  <div class="field"><label>提问文案</label><textarea id="fAsk"></textarea></div>
+  <div class="field"><label>她点「要」之后显示的话</label><textarea id="fReply"></textarea></div>
+
+  <div class="ebtns">
+    <button class="bSave" id="eSave">保存</button>
+    <button class="bExp" id="eExport">导出 HTML（拿去发她）</button>
+    <button class="bReset" id="eReset">恢复默认内容</button>
+  </div>
+  <div class="tipx">保存只是存在这台手机的浏览器里。想让链接发给别人，必须点「导出 HTML」。</div>
+</div>
+
+<script id="seed" type="application/json">
+{
+  "startDate": "2025-01-01",
+  "targetDay": 600,
+  "eyebrow": "OUR DAYS",
+  "introTip": "我攒了很久的话",
+  "tlTitle": "这一路",
+  "albumTitle": "我们的回忆",
+  "timeline": [
+    {
+      "day": "DAY 001",
+      "title": "我们在一起了",
+      "sub": "从那天开始计时"
+    },
+    {
+      "day": "DAY 100",
+      "title": "第一次一起出远门",
+      "sub": "想去看的那片海"
+    },
+    {
+      "day": "DAY 200",
+      "title": "一起过的第一个生日",
+      "sub": "蛋糕买小了一点"
+    },
+    {
+      "day": "DAY 300",
+      "title": "吵了一架，然后和好",
+      "sub": "谁也没真的生气"
+    },
+    {
+      "day": "DAY 500",
+      "title": "开始计划以后",
+      "sub": "比如住在哪"
+    },
+    {
+      "day": "DAY 600",
+      "title": "今天",
+      "sub": "我写了这个只给你的页面"
+    }
+  ],
+  "photos": [
+    {
+      "src": "/img/photo01.jpg",
+      "note": "第 1 张的配文",
+      "when": "2025.02"
+    },
+    {
+      "src": "/img/photo02.jpg",
+      "note": "第 2 张的配文",
+      "when": "2025.03"
+    },
+    {
+      "src": "/img/photo03.jpg",
+      "note": "第 3 张的配文",
+      "when": "2025.04"
+    },
+    {
+      "src": "/img/photo04.jpg",
+      "note": "第 4 张的配文",
+      "when": "2025.05"
+    },
+    {
+      "src": "/img/photo05.jpg",
+      "note": "第 5 张的配文",
+      "when": "2025.06"
+    },
+    {
+      "src": "/img/photo06.jpg",
+      "note": "第 6 张的配文",
+      "when": "2025.07"
+    },
+    {
+      "src": "/img/photo07.jpg",
+      "note": "第 7 张的配文",
+      "when": "2025.08"
+    },
+    {
+      "src": "/img/photo08.jpg",
+      "note": "第 8 张的配文",
+      "when": "2025.09"
+    },
+    {
+      "src": "/img/photo09.jpg",
+      "note": "第 9 张的配文",
+      "when": "2025.10"
+    },
+    {
+      "src": "/img/photo10.jpg",
+      "note": "第 10 张的配文",
+      "when": "2025.11"
+    },
+    {
+      "src": "/img/photo11.jpg",
+      "note": "第 11 张的配文",
+      "when": "2025.12"
+    },
+    {
+      "src": "/img/photo12.jpg",
+      "note": "第 12 张的配文",
+      "when": "2025.01"
+    },
+    {
+      "src": "/img/photo13.jpg",
+      "note": "第 13 张的配文",
+      "when": "2025.02"
+    },
+    {
+      "src": "/img/photo14.jpg",
+      "note": "第 14 张的配文",
+      "when": "2025.03"
+    },
+    {
+      "src": "/img/photo15.jpg",
+      "note": "第 15 张的配文",
+      "when": "2025.04"
+    },
+    {
+      "src": "/img/photo16.jpg",
+      "note": "第 16 张的配文",
+      "when": "2025.05"
+    },
+    {
+      "src": "/img/photo17.jpg",
+      "note": "第 17 张的配文",
+      "when": "2025.06"
+    },
+    {
+      "src": "/img/photo18.jpg",
+      "note": "第 18 张的配文",
+      "when": "2025.07"
+    },
+    {
+      "src": "/img/photo19.jpg",
+      "note": "第 19 张的配文",
+      "when": "2025.08"
+    },
+    {
+      "src": "/img/photo20.jpg",
+      "note": "第 20 张的配文",
+      "when": "2025.09"
+    }
+  ],
+  "letter": [
+    "有些话我一直没说完整。",
+    "比如你笑起来的时候，我其实会偷偷看很久。",
+    "比如我脾气不好，但每次生气完，最后想通的都是舍不得你。",
+    "这些日子不算很长，可我已经习惯了你在旁边的重量。",
+    "我想要的不是这些天，是后面所有的日子。"
+  ],
+  "sign": "—— 一直在的那个人",
+  "ask": "今天到了\n下一个纪念日\n要不要还跟我一起",
+  "reply": "嗯，我也不打算放手。\n—— 这只是开头。",
+  "cities": [],
+  "leadText": "我们已经在一起",
+  "addText": "而且还在往上加",
+  "cityTitle": "我们去过的地方",
+  "mapHint": "点城市看照片 · 双指可以放大",
+  "unitText": "天",
+  "yesText": "要 ❤️",
+  "noText": "不要 💔",
+  "filmPhotos": [],
+  "endingText": "故事还长，只是一个逗号。",
+  "rev": "template-1"
+}
+</script>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s);};
+var on=function(sel,ev,fn,opt){var el=$(sel);if(el)el.addEventListener(ev,fn,opt);return el;};
+var raf=window.requestAnimationFrame||function(f){return setTimeout(f,16);};
+var LS_KEY='anniv600_data_v2';
+var MAP_D="M439,158 440,158 440,157 435,157 433,154 432,152 431,153 430,153 430,154 429,154 430,156 428,156 427,157 423,159 425,162 424,163 423,163 420,165 420,166 421,168 420,168 421,170 422,170 424,171 425,170 427,170 430,172 430,171 431,170 433,170 435,168 433,167 433,165 436,165 439,164 439,163 438,161 438,159 439,158ZM443,173 444,172 445,170 442,170 441,166 441,165 443,166 443,165 440,162 437,164 437,167 438,167 437,168 437,170 435,170 435,169 434,170 433,172 434,172 434,173 434,173 435,176 433,177 433,180 436,181 437,183 438,182 438,183 443,181 442,180 444,179 444,176 446,175 444,173 441,173 442,172 443,173ZM440,157 438,159 438,161 439,162 441,162 443,165 443,166 441,165 441,166 442,170 443,171 443,170 445,170 444,173 446,174 446,175 448,177 450,179 452,178 451,176 455,175 455,176 458,173 459,169 461,168 461,167 464,166 463,164 463,163 462,162 461,159 458,159 457,158 457,157 456,157 454,155 455,154 456,153 455,152 456,152 458,149 454,149 454,149 449,149 449,146 447,144 447,143 448,144 449,143 448,141 448,140 447,140 447,139 445,138 446,137 446,136 443,133 440,134 439,135 436,135 435,136 435,139 433,138 434,140 433,141 431,142 429,141 426,144 425,142 424,142 419,144 419,146 418,146 414,146 414,143 415,143 414,140 411,139 410,140 411,141 409,141 408,143 408,147 406,147 404,148 406,150 404,152 406,154 406,155 408,158 409,161 411,161 410,162 406,163 406,164 405,164 405,165 406,166 408,166 408,167 409,167 410,170 411,170 410,174 410,175 409,177 407,177 406,176 404,177 403,178 404,180 401,183 401,186 404,188 406,193 405,193 407,194 403,200 403,204 402,203 402,204 400,205 401,208 403,210 409,211 411,213 415,212 415,213 417,211 419,213 420,212 418,208 420,205 422,204 425,198 428,197 428,196 429,195 430,196 434,192 440,191 441,189 443,188 445,185 443,185 442,182 438,183 438,182 437,183 436,181 433,180 433,177 435,176 434,173 434,173 434,172 433,172 434,170 431,170 430,171 430,172 427,170 425,170 423,171 422,170 421,170 420,168 421,168 420,166 420,165 423,163 424,163 425,162 423,159 427,157 428,156 430,156 429,154 430,154 430,153 431,153 432,152 435,157 440,157ZM438,164 433,165 433,167 435,167 434,169 435,170 437,170 437,168 438,167 437,166 438,164ZM443,173 442,172 441,173 442,174 443,173ZM369,231 374,231 375,230 377,229 381,228 384,225 386,226 386,223 393,224 395,223 395,222 397,222 397,221 399,221 400,220 401,218 402,219 401,216 402,216 403,210 401,208 400,205 402,204 402,203 403,204 403,200 407,194 405,193 406,193 404,188 401,186 401,183 404,180 403,178 404,177 406,176 407,177 409,177 410,175 410,174 411,170 410,170 409,167 408,167 408,166 406,166 405,165 405,164 406,164 406,163 410,162 411,161 409,161 408,158 407,156 406,157 406,159 404,160 403,159 401,161 399,161 398,160 396,161 393,163 390,162 389,162 385,168 385,170 383,170 380,169 379,172 377,173 378,174 377,177 375,178 374,184 371,187 371,190 373,192 373,195 373,196 372,197 372,198 369,202 369,206 370,207 370,212 372,219 368,228 368,230 369,231ZM237,131 244,145 242,148 245,152 249,154 249,158 252,157 251,156 252,156 254,158 253,157 255,156 257,157 257,155 261,155 262,154 267,155 268,157 267,162 264,165 260,167 264,167 268,169 269,171 271,172 270,173 274,173 274,177 275,178 278,177 277,178 279,180 282,182 283,182 286,179 284,176 285,176 290,174 296,176 299,173 304,172 306,172 306,174 307,178 304,182 300,185 301,188 299,189 300,191 302,192 307,197 319,193 321,193 322,192 323,192 324,190 323,188 324,186 324,182 325,179 327,176 328,176 328,174 331,174 332,173 333,173 333,175 335,177 333,181 331,185 330,186 335,188 337,188 340,190 340,190 345,192 346,194 353,194 353,189 355,191 356,189 355,187 356,184 359,182 359,181 362,179 363,177 365,176 365,174 365,175 368,174 367,172 369,174 371,173 372,174 374,171 377,170 376,173 379,172 380,169 383,170 385,170 385,168 389,162 390,162 393,163 396,161 398,160 399,161 401,161 403,159 404,160 406,159 406,157 407,156 406,154 404,152 406,150 404,148 406,147 408,147 408,143 409,141 411,141 410,140 411,139 414,140 415,143 414,143 414,146 418,146 419,146 419,144 424,142 425,142 426,144 429,141 431,142 433,141 434,140 433,138 435,139 435,136 436,135 439,135 440,134 443,133 446,136 446,137 445,138 447,139 447,140 448,140 448,141 449,143 448,144 447,143 447,144 449,146 448,147 449,149 454,149 454,149 457,150 459,148 459,146 460,146 459,145 458,143 459,140 458,138 461,136 462,138 464,138 466,145 468,142 470,141 470,140 474,138 476,138 479,135 482,135 482,136 484,134 485,133 488,133 488,132 489,133 490,132 489,131 490,131 494,132 498,131 497,130 498,129 501,129 503,124 500,124 499,123 499,122 500,122 500,121 501,121 499,116 499,115 497,112 497,110 492,113 488,113 488,111 487,109 487,108 487,108 487,107 486,105 488,101 487,101 487,99 486,98 485,96 482,95 484,94 483,92 484,92 488,95 490,93 491,95 491,94 493,96 494,93 493,91 496,91 497,89 496,87 496,85 502,84 502,81 501,82 501,81 499,80 500,81 499,82 498,82 497,83 496,83 495,82 494,80 493,80 494,79 492,78 490,76 491,73 497,70 499,68 501,67 508,61 510,66 510,67 511,66 511,61 514,54 515,53 517,54 518,53 518,50 517,48 518,47 517,44 519,43 518,42 520,41 521,38 524,37 523,34 525,33 526,31 519,24 517,23 514,27 512,27 510,27 510,28 508,27 505,28 503,26 502,27 500,28 496,27 494,25 493,19 492,18 493,16 490,15 490,14 487,13 485,15 483,15 482,14 477,12 483,7 482,4 480,3 474,4 468,8 466,10 466,12 470,11 473,12 472,15 473,17 472,20 466,23 465,27 463,29 463,30 460,33 461,34 457,39 459,39 459,41 456,44 451,44 444,49 433,45 426,58 423,61 424,65 421,66 421,69 425,72 428,69 430,70 433,69 436,70 439,72 444,68 451,68 453,71 457,72 457,73 459,74 459,75 463,78 465,81 465,84 464,84 462,85 459,85 457,84 455,83 453,84 449,83 443,86 441,85 440,85 439,88 434,87 431,89 428,93 428,95 427,96 426,96 422,99 419,100 413,99 411,100 410,102 407,105 402,107 394,106 390,103 385,104 382,107 380,112 382,116 384,117 385,120 383,121 381,123 376,125 370,131 361,135 354,136 340,135 323,142 318,144 316,146 315,145 311,145 311,142 304,143 300,142 293,139 286,138 284,135 274,133 269,132 261,134 237,131ZM501,168 507,167 507,168 509,164 513,161 515,159 516,160 516,159 518,157 520,158 521,156 522,156 523,155 521,154 523,151 521,148 520,145 519,145 518,143 518,141 520,139 519,139 518,137 517,137 517,136 516,135 516,133 516,133 515,131 514,131 514,127 510,131 509,130 510,129 509,129 510,128 508,126 506,125 503,123 501,129 498,129 497,130 498,131 494,132 490,131 489,131 490,132 489,133 488,132 488,133 485,133 484,134 482,136 482,135 479,135 476,138 474,138 470,140 470,141 468,142 466,145 464,138 462,138 461,136 458,138 458,138 459,140 458,143 460,147 456,152 455,152 456,153 455,154 454,155 456,157 457,157 457,158 458,159 461,159 462,162 463,163 463,164 464,165 470,163 472,160 474,157 476,157 475,155 476,156 477,155 480,155 480,155 481,155 484,154 485,157 487,157 488,159 487,161 485,162 485,164 483,166 481,167 480,170 478,171 479,172 478,173 481,174 483,173 481,174 482,176 482,177 481,176 481,177 479,177 479,178 476,178 477,181 483,179 482,178 482,177 485,178 484,177 486,177 487,176 487,175 490,172 496,169 498,169 498,168 501,168ZM562,136 563,135 564,129 567,129 567,130 568,130 568,132 570,134 571,133 572,136 571,135 571,133 570,132 577,129 577,128 579,123 577,124 576,123 574,123 572,121 570,121 569,116 566,119 565,116 563,118 558,119 558,121 554,122 553,120 553,118 552,118 550,115 550,112 549,110 547,112 546,112 546,115 543,116 540,112 540,110 541,110 537,109 536,110 535,106 536,105 535,103 533,103 531,101 528,103 525,102 522,100 522,98 520,98 519,100 516,100 515,98 514,99 509,99 509,98 506,95 506,94 505,93 506,92 505,89 501,89 498,89 496,91 493,91 494,93 493,96 491,94 491,95 490,93 488,95 486,93 483,92 484,94 482,95 485,96 486,98 487,99 487,101 488,101 486,105 487,107 487,108 487,108 487,109 488,111 488,113 492,113 497,110 497,112 499,115 499,116 501,120 500,122 499,122 500,124 503,124 503,123 504,123 506,125 508,126 510,128 509,129 510,129 509,130 510,131 514,127 514,131 515,131 516,133 516,133 516,135 517,136 517,137 518,137 519,139 520,139 518,141 519,142 519,145 520,145 521,148 523,151 521,154 526,154 527,152 531,149 532,145 532,145 532,144 534,145 535,143 537,146 537,147 538,147 541,147 542,148 546,148 547,149 549,146 546,141 555,141 558,138 558,136 559,135 561,136 562,136ZM501,89 505,89 506,92 505,93 506,94 506,95 509,98 509,99 514,99 515,98 516,100 519,100 520,98 522,98 522,100 525,102 528,103 531,101 533,103 535,103 536,105 535,106 536,110 537,109 541,110 540,110 540,112 543,116 546,115 546,112 547,112 549,110 550,112 550,115 552,118 553,118 553,120 554,122 558,121 558,119 563,118 565,116 566,119 569,116 570,121 572,121 574,123 576,123 577,124 579,123 578,122 579,116 577,108 575,106 577,105 581,105 584,100 586,101 595,104 597,103 597,99 600,97 600,94 602,93 603,90 605,89 604,88 605,87 604,86 606,84 606,80 608,79 607,76 609,75 611,74 613,71 611,68 612,65 616,62 615,62 613,63 608,63 603,65 601,66 597,66 594,69 592,68 591,71 589,71 585,72 581,72 580,71 576,71 572,66 574,64 573,63 573,62 572,62 571,60 572,57 568,57 565,55 563,52 561,52 561,50 556,51 556,50 553,50 554,49 553,48 547,49 544,48 541,46 541,43 542,40 539,39 539,38 538,38 539,36 538,34 535,30 535,27 534,27 535,28 534,28 535,26 533,26 534,25 532,24 533,23 530,20 531,17 529,16 530,15 529,15 529,14 527,12 525,11 527,10 525,10 524,8 522,9 523,7 522,6 521,6 517,4 514,5 514,6 512,4 510,4 508,2 507,3 504,1 502,0 501,1 501,0 500,1 498,0 494,1 490,1 489,1 482,2 480,3 484,6 481,9 477,12 482,14 483,15 484,16 487,13 490,14 490,15 493,16 492,18 493,19 494,25 496,27 500,28 502,27 503,26 505,28 508,27 510,28 510,27 512,27 514,27 517,23 519,24 526,31 525,33 523,34 524,37 521,38 520,41 518,42 519,43 517,44 518,47 517,48 518,50 518,53 517,54 515,53 514,54 511,61 511,66 510,67 510,66 508,61 501,67 499,68 497,70 491,73 490,76 492,78 494,79 493,80 494,80 495,82 496,83 497,83 498,82 499,82 500,81 499,80 501,81 501,82 502,81 502,84 496,85 496,87 497,89 501,89ZM475,275 475,275 475,277 476,277 478,279 482,277 485,278 485,277 485,275 483,271 479,269 477,270 476,273 474,273 475,275ZM485,267 481,266 479,264 477,266 479,268 480,268 484,270 485,269 485,267ZM484,271 486,272 487,271 484,271ZM485,272 485,273 486,272 485,272ZM439,232 437,233 436,230 433,227 433,227 430,228 429,231 434,234 435,234 436,236 437,238 441,238 441,239 442,238 443,240 443,242 447,242 445,248 446,249 448,248 449,253 449,254 453,254 454,251 456,251 457,253 458,255 456,257 455,256 451,256 451,257 452,257 453,259 452,260 451,260 449,262 449,264 451,265 450,266 452,266 452,266 452,267 453,267 454,267 454,270 453,271 453,272 459,271 459,273 461,274 465,273 467,276 470,276 471,278 473,276 472,275 475,275 474,273 476,273 477,270 479,268 477,266 478,265 479,264 481,266 485,267 484,263 480,261 480,258 475,255 475,252 474,247 473,246 469,235 462,231 460,230 461,229 459,229 460,229 460,229 458,229 458,225 454,226 453,229 453,230 450,230 449,233 447,234 447,232 445,230 443,230 444,232 442,232 441,233 439,232ZM450,308 450,309 453,308 454,309 453,312 454,313 455,318 456,318 458,319 462,316 463,320 468,318 470,322 471,322 473,318 472,317 473,314 474,315 475,313 477,314 477,314 477,313 475,312 476,310 477,310 477,311 478,311 480,308 482,308 482,307 481,304 482,303 482,301 483,301 482,297 483,297 485,299 486,292 484,291 487,288 483,287 479,283 476,281 476,280 478,278 476,277 475,277 475,275 472,275 473,276 471,278 470,276 467,276 465,273 462,273 460,279 458,280 460,283 458,284 455,283 454,283 454,288 453,290 450,293 447,295 446,297 446,299 448,300 450,303 450,308ZM487,287 489,288 488,286 485,285 486,287 487,287ZM487,283 486,284 488,284 488,283 487,283ZM489,288 490,289 490,288 489,288 489,288ZM490,282 488,281 488,282 490,282ZM487,291 486,290 486,291 487,291ZM484,287 485,287 484,286 484,287ZM476,312 477,312 476,312 476,312ZM431,238 432,240 427,242 425,238 422,238 421,240 422,240 421,241 422,243 419,244 418,249 415,249 414,251 417,252 418,256 420,256 422,258 425,256 424,257 425,261 425,265 420,267 419,271 421,273 423,273 426,275 423,279 425,281 425,283 426,285 427,289 428,290 431,288 432,286 435,288 432,291 433,292 437,291 436,289 438,288 438,289 440,289 441,292 446,292 447,294 449,294 449,293 450,293 452,292 454,288 454,283 455,283 458,284 460,283 458,280 460,279 462,275 462,273 459,273 459,271 453,272 453,271 454,270 454,267 453,267 452,267 452,266 451,266 449,264 449,262 451,260 452,260 453,259 452,257 451,257 451,256 455,256 456,257 458,255 457,253 456,251 454,251 453,252 453,254 449,254 448,252 449,251 448,248 446,249 445,248 447,242 443,242 443,240 442,238 441,239 441,238 437,238 436,236 435,234 431,232 430,230 427,231 427,233 429,235 431,235 431,237 431,238ZM456,348 456,347 455,348 454,347 455,346 455,345 456,346 456,346 457,347 457,348 457,345 458,346 459,345 457,343 458,342 459,343 459,342 460,342 460,343 460,343 461,344 461,343 461,344 462,342 463,343 464,343 463,340 462,342 460,340 462,340 463,336 462,334 462,333 465,332 463,329 461,328 462,327 464,328 465,326 466,327 464,330 467,328 467,326 466,325 468,325 468,323 470,322 468,318 463,320 462,316 458,319 456,318 455,318 454,313 453,312 454,309 453,308 450,309 450,308 449,309 449,310 444,312 443,314 441,312 438,313 438,314 438,315 436,316 437,320 436,323 432,324 431,326 432,331 431,331 430,332 429,334 430,335 429,336 427,338 427,339 426,340 426,344 424,346 425,348 424,349 426,350 427,350 428,351 429,350 431,353 434,352 433,354 435,358 435,360 435,362 437,366 439,366 440,365 442,362 443,361 447,357 446,355 447,353 448,354 451,353 452,354 453,351 452,350 455,350 455,349 456,348ZM450,354 448,355 449,356 450,355 450,354ZM460,346 461,346 461,346 460,345 460,346ZM448,354 446,354 446,355 448,354ZM447,295 446,292 441,292 440,289 438,289 438,288 436,289 437,291 433,292 432,291 435,288 432,286 431,288 428,290 427,289 425,291 422,289 421,289 418,292 417,291 417,293 416,292 414,294 415,294 414,295 411,295 409,295 408,297 406,297 405,298 405,300 407,301 406,305 408,306 407,306 408,308 405,310 406,311 403,312 403,314 401,317 402,320 404,319 403,323 405,324 404,326 404,328 407,329 405,334 407,333 408,334 406,335 405,339 406,345 409,344 411,343 413,345 413,347 411,347 409,349 409,351 407,352 410,354 412,353 413,354 413,353 414,353 415,352 420,351 422,354 424,353 423,351 425,349 424,346 426,344 426,340 427,339 427,338 429,336 430,335 429,334 430,332 431,331 432,331 432,330 431,329 431,326 432,324 436,323 437,320 436,316 438,315 438,314 438,313 441,312 443,314 444,312 449,310 449,309 450,308 449,302 446,298 447,295ZM429,231 430,228 433,227 433,227 436,230 437,233 439,231 441,233 442,232 444,232 443,230 445,230 447,232 447,234 449,233 450,230 453,230 453,229 454,226 458,225 459,225 462,219 465,218 465,217 466,218 466,216 469,214 467,213 467,212 469,212 468,213 473,213 472,209 474,208 474,210 475,208 475,207 474,207 476,207 481,204 480,204 482,205 482,204 486,202 486,203 487,203 487,204 491,203 491,201 490,201 490,200 492,200 491,198 493,197 487,197 487,195 481,196 479,194 478,195 477,193 473,192 468,193 468,195 464,197 464,199 463,200 459,200 458,198 456,199 455,195 456,194 458,194 458,191 457,192 455,188 452,188 451,189 446,187 444,186 443,189 441,189 440,191 434,192 430,196 429,195 428,196 428,197 425,198 422,204 420,205 419,206 418,208 419,210 420,211 420,213 419,217 426,213 426,214 425,215 422,217 420,218 419,220 416,222 414,226 415,227 418,227 418,228 420,229 421,231 425,231 428,232 429,231ZM393,258 398,258 400,260 403,258 403,262 404,265 405,265 405,266 407,265 408,266 411,266 411,268 412,268 414,269 416,269 417,268 419,270 420,267 422,266 424,266 425,261 424,257 425,256 422,258 420,256 418,256 417,252 414,251 415,249 417,250 419,249 419,244 422,243 421,241 422,240 421,240 422,238 423,237 425,238 426,241 427,242 428,242 432,240 431,237 431,235 429,235 427,233 427,231 427,231 421,231 420,229 418,228 418,227 415,227 414,226 416,222 419,220 420,218 422,217 425,215 426,214 426,213 419,217 420,212 419,213 417,211 415,213 415,212 411,213 409,211 403,210 402,216 401,216 402,219 401,218 400,220 399,221 397,221 397,222 395,222 395,223 393,224 386,223 386,226 384,225 381,228 377,229 375,230 374,231 369,231 371,234 370,235 372,236 371,238 372,239 371,240 376,244 375,247 378,251 378,252 380,254 381,256 382,255 387,258 389,259 391,258 393,258ZM376,249 375,248 373,249 371,248 370,249 368,249 362,247 360,249 363,250 363,252 365,252 367,253 368,255 366,256 362,255 360,259 362,262 361,266 363,266 363,268 367,270 368,273 367,274 367,275 366,277 364,276 359,281 358,280 357,281 356,279 354,281 352,280 351,281 350,281 350,283 351,284 351,289 349,289 351,291 352,289 352,291 355,292 355,295 356,294 357,297 358,298 360,293 361,292 363,292 363,290 367,290 369,292 371,291 372,290 370,288 371,287 370,287 373,287 374,286 378,287 379,288 384,288 386,290 386,291 388,291 388,293 390,292 392,292 395,290 395,291 396,290 395,292 395,294 396,293 396,294 397,294 401,289 401,291 402,291 403,292 402,293 403,294 402,296 402,297 402,298 404,298 404,299 406,297 408,297 409,295 411,295 414,295 415,294 414,294 416,292 417,293 417,291 418,292 421,289 422,289 425,291 427,289 426,285 425,283 425,281 423,279 424,277 426,276 424,273 423,274 422,272 421,273 419,270 418,270 417,268 416,269 414,269 412,268 411,268 411,266 408,266 407,265 405,266 403,263 403,258 400,260 398,258 393,258 391,258 389,259 382,255 381,256 380,254 378,252 377,249 376,249ZM386,351 387,350 387,346 392,347 393,349 394,349 395,349 395,346 396,346 394,345 394,344 395,345 398,342 401,344 404,344 405,343 405,341 405,340 406,337 406,336 408,334 407,333 405,334 407,329 404,328 404,326 405,324 403,323 404,319 402,320 401,317 403,314 403,312 406,311 405,310 408,308 407,306 408,306 406,305 407,301 405,300 405,299 402,298 402,297 402,296 403,294 402,293 403,292 402,291 401,291 401,289 396,294 396,293 395,294 395,292 396,290 395,291 394,290 392,292 390,292 388,293 388,291 386,291 386,290 384,288 379,288 378,287 373,286 373,287 370,287 371,287 370,288 372,290 371,291 369,292 367,290 364,290 363,290 363,292 361,292 360,293 358,297 358,298 359,299 358,302 358,302 357,304 359,304 358,307 359,308 359,312 360,317 359,319 357,318 353,323 355,324 356,322 357,323 358,322 360,322 361,324 360,325 361,325 361,327 361,327 358,327 360,329 358,332 359,333 360,332 361,334 360,335 363,336 362,337 364,337 363,336 365,334 366,334 366,335 367,335 368,336 372,332 374,333 375,331 378,333 377,337 378,338 380,338 379,339 379,342 375,346 375,348 377,349 377,348 378,346 380,348 380,352 381,352 383,351 386,351ZM401,382 402,380 401,380 403,378 402,376 404,379 409,377 411,379 412,378 412,377 411,377 413,375 413,378 414,378 416,375 417,375 419,375 419,376 421,377 422,376 421,375 422,374 424,376 429,373 431,373 431,371 434,370 434,366 437,366 435,361 435,358 433,354 434,352 431,353 429,350 428,351 427,350 426,350 424,349 423,351 424,353 422,354 420,351 415,352 414,353 413,353 413,354 412,353 410,354 407,352 409,351 409,349 411,347 413,347 413,345 411,343 406,345 406,343 404,343 404,344 401,344 398,342 395,345 394,344 394,345 396,346 395,346 395,349 394,349 393,349 392,347 387,346 387,350 385,352 386,356 384,358 385,360 384,363 382,362 382,365 380,365 379,367 379,369 380,372 379,374 378,376 376,376 376,377 373,378 372,379 373,381 372,382 372,383 369,382 369,386 365,386 365,389 363,389 363,391 365,392 363,393 362,398 363,402 364,403 365,406 369,406 371,404 369,399 367,398 368,396 370,395 372,394 373,392 376,392 378,391 378,392 380,391 382,391 383,389 384,390 385,390 386,389 385,388 387,387 388,388 389,388 390,387 392,388 393,386 395,387 396,383 398,386 401,384 401,382ZM436,367 437,368 437,367 436,367ZM394,388 393,389 393,389 393,390 394,388ZM391,390 392,389 392,388 391,390ZM370,395 371,396 372,394 370,395ZM371,396 369,396 368,398 370,397 371,398 371,396ZM433,400 434,401 433,402 434,402 435,400 433,400ZM372,398 371,398 371,399 372,398ZM425,396 426,396 426,395 425,396ZM360,336 359,339 356,338 354,339 356,339 356,342 354,342 353,340 352,341 352,344 349,342 348,343 347,343 347,346 343,347 342,344 340,346 340,343 339,343 338,341 335,343 335,345 327,349 327,351 326,353 325,351 320,350 320,349 318,349 318,348 316,349 316,351 313,353 311,351 310,352 311,355 313,356 313,355 317,355 318,360 319,359 320,360 321,359 322,360 324,360 325,359 326,359 327,362 327,366 325,367 324,366 322,368 322,369 321,370 321,372 323,372 324,374 327,373 329,374 331,373 334,375 331,379 331,380 332,382 332,385 333,385 335,385 336,386 336,387 338,388 339,388 339,390 340,389 341,390 344,389 345,390 347,391 348,390 348,391 350,390 352,389 353,390 357,390 356,391 357,392 361,392 362,390 363,391 363,389 365,389 365,387 369,386 369,382 372,383 372,382 373,381 372,379 373,378 376,377 376,376 378,376 379,374 380,372 379,369 379,367 380,365 382,365 382,362 384,363 385,360 384,358 386,356 385,353 386,351 383,351 381,352 380,352 380,348 378,346 377,348 377,349 375,348 375,346 379,342 379,339 380,338 378,338 377,337 378,333 375,331 374,333 372,332 368,336 367,335 366,335 366,334 365,334 363,336 363,338 362,337 363,336 362,335 360,336ZM367,409 362,409 360,411 359,410 357,413 352,417 351,424 352,428 361,432 363,431 363,429 366,429 368,426 370,426 372,418 376,414 376,412 375,409 374,409 372,407 371,408 369,408 367,409ZM388,606 388,606 388,605 388,606ZM398,554 399,552 399,552 398,554ZM443,468 443,469 444,469 443,468 443,467 444,468 443,467 443,468ZM383,455 384,455 383,455 383,455 383,455ZM382,455 381,456 382,455 382,456 382,455ZM404,560 406,561 409,560 411,556 410,556 404,560ZM424,535 425,535 425,534 424,535ZM412,531 412,532 412,531 412,531ZM360,563 363,561 365,561 362,561 360,563ZM410,521 411,521 411,520 410,521ZM430,526 430,527 432,527 430,526ZM417,551 418,551 419,551 417,551ZM365,557 366,557 366,556 365,557ZM370,554 371,554 371,553 370,554ZM421,549 421,550 421,549 421,549ZM404,419 405,419 404,419 404,419ZM329,305 331,305 330,301 332,304 331,306 333,306 333,304 334,304 334,302 335,302 336,301 338,301 338,302 339,301 340,297 341,297 341,298 343,298 343,297 344,300 346,298 349,298 349,302 349,303 352,304 351,307 352,307 352,306 353,305 353,306 353,309 356,309 357,306 359,304 357,304 358,303 358,301 359,299 357,297 356,294 355,295 355,292 352,291 352,289 351,291 349,289 351,289 351,284 350,283 350,281 351,281 352,280 354,281 356,279 357,281 358,280 359,281 364,276 366,277 367,275 367,274 368,273 367,270 363,268 363,266 358,266 358,265 356,264 349,260 350,262 348,263 351,266 351,267 349,269 347,269 347,271 346,272 346,274 345,275 345,276 344,278 343,276 342,277 340,277 340,278 341,279 336,287 335,286 333,287 331,283 328,285 327,283 323,282 323,284 322,284 322,285 321,285 323,287 323,289 319,293 320,294 320,296 322,296 323,300 326,300 326,301 328,301 329,305ZM277,321 277,323 279,325 279,327 281,327 279,329 282,331 282,333 283,333 284,335 285,335 287,335 291,332 292,333 293,333 294,332 295,331 296,329 294,325 294,320 295,319 297,319 300,314 301,312 300,311 301,309 302,308 303,309 304,308 303,305 304,303 305,304 310,304 308,305 308,307 310,309 310,309 310,310 309,311 311,314 314,313 316,310 318,312 319,315 321,314 322,316 329,314 329,312 328,310 324,310 324,308 322,308 322,305 323,304 324,304 325,302 329,306 328,301 326,301 326,300 323,300 322,296 320,296 320,294 319,294 318,292 323,289 323,287 321,285 322,285 322,284 323,284 324,282 327,283 328,285 331,283 333,287 335,286 336,287 341,279 340,278 340,277 342,277 343,276 344,278 345,276 345,275 346,274 346,272 347,271 347,269 349,269 351,267 351,266 348,263 349,263 349,262 350,262 349,261 351,260 348,259 345,261 342,258 340,258 340,256 338,258 336,256 336,254 333,254 330,255 327,254 326,252 321,254 320,251 319,252 320,254 317,255 312,255 308,253 308,251 310,250 309,250 309,247 310,247 308,246 307,243 306,242 301,242 301,241 299,242 297,241 297,238 297,237 295,235 291,237 292,237 290,237 289,239 287,239 289,242 289,243 290,244 290,245 287,247 288,248 287,247 286,248 284,249 283,247 285,245 284,243 282,246 283,247 282,249 280,248 279,249 278,247 277,248 277,250 277,252 278,253 277,255 275,255 272,255 272,256 270,254 269,254 269,254 268,254 268,255 267,255 267,253 264,250 263,254 259,252 258,252 257,250 254,249 253,247 252,243 250,240 249,237 246,237 244,236 242,237 242,239 239,240 239,241 240,243 241,244 241,245 243,246 240,249 241,251 239,252 240,255 248,259 248,260 250,263 250,265 254,270 253,272 252,271 252,273 255,278 255,279 256,288 255,291 257,296 257,306 259,309 260,305 263,301 263,303 267,308 267,309 266,310 267,313 269,313 269,315 270,313 271,314 272,313 276,321 277,321ZM358,306 357,306 356,309 353,309 353,305 352,306 352,307 351,307 352,304 349,303 349,302 349,298 346,298 344,300 343,297 343,298 340,297 339,301 338,302 338,301 336,301 335,302 334,302 334,304 333,304 333,306 331,306 332,304 330,301 331,305 330,305 329,306 325,302 324,304 323,304 322,305 322,308 324,308 324,310 327,310 328,311 329,313 328,314 322,316 321,314 319,315 317,319 316,319 314,320 314,319 311,320 309,318 307,321 305,318 304,320 302,323 303,324 303,326 303,329 304,330 306,330 307,328 309,328 310,327 312,331 311,333 309,340 310,341 310,342 311,342 311,343 312,345 314,345 312,347 313,348 311,351 313,353 316,351 316,349 318,348 318,349 320,349 320,350 325,351 326,353 327,351 327,349 335,345 335,343 338,341 339,343 340,343 340,346 342,344 343,346 343,345 343,347 344,347 347,346 347,343 348,343 349,342 352,344 352,341 353,340 354,342 356,342 356,339 354,339 356,338 359,339 361,334 360,332 359,333 358,332 360,329 358,327 360,327 360,325 361,324 361,323 360,322 358,322 357,323 356,322 355,324 353,323 357,318 359,319 360,317 360,315 359,314 359,312 359,311 358,311 359,308 358,308 358,306ZM360,326 361,327 361,325 360,326ZM319,315 318,312 316,310 314,313 311,313 309,311 310,310 310,308 308,307 308,305 310,304 305,304 304,303 303,305 304,308 303,309 302,308 301,309 300,311 301,312 300,314 297,319 295,319 294,320 294,325 296,329 295,332 294,332 293,333 292,333 291,332 287,335 285,335 284,335 284,334 281,333 282,331 279,329 281,327 279,327 279,325 277,323 277,321 276,321 272,313 271,314 270,313 269,315 269,313 267,313 266,310 267,309 267,308 263,303 263,301 260,305 259,309 257,306 257,297 255,297 255,301 254,302 253,299 252,300 252,303 251,303 253,307 253,309 249,310 249,307 248,307 248,309 247,309 247,312 249,317 250,317 250,316 253,317 253,328 252,333 253,334 251,334 253,338 252,338 251,338 249,342 247,341 247,343 245,346 244,345 243,347 243,350 241,351 241,355 242,355 243,358 241,361 242,362 246,359 251,359 251,359 254,358 254,359 252,361 252,363 253,363 254,365 254,366 255,367 254,370 257,371 259,371 261,372 261,373 260,373 260,374 259,376 259,379 257,383 265,384 265,387 265,388 267,389 267,390 267,391 270,390 271,391 277,387 278,394 278,395 281,394 283,395 284,394 283,393 283,390 284,389 283,387 282,385 281,382 282,379 283,379 285,380 286,379 288,380 291,375 296,379 299,375 301,377 302,375 305,379 307,375 308,374 308,376 309,376 311,374 313,375 314,373 314,371 314,371 318,369 319,368 321,370 321,369 322,369 322,368 324,366 325,367 327,366 327,362 325,359 323,360 323,359 322,360 321,359 320,360 319,359 318,360 317,355 313,355 313,356 311,355 310,352 313,348 312,347 314,345 312,345 311,343 311,342 310,342 310,341 309,340 312,331 310,327 309,328 307,328 306,330 304,329 303,326 303,324 302,323 304,320 305,318 307,321 309,318 312,320 314,319 314,320 316,319 317,319 319,315ZM163,213 155,210 153,210 150,208 141,210 140,209 137,210 133,210 128,212 127,212 126,216 122,217 122,218 118,217 116,217 110,220 110,220 107,222 106,221 102,222 97,221 95,220 95,218 93,218 90,217 89,218 89,219 86,221 86,222 82,223 81,223 79,222 78,222 76,221 75,222 70,221 68,223 69,224 66,226 64,233 56,233 55,237 52,237 53,242 52,243 57,248 57,250 58,251 58,253 59,254 58,257 55,259 53,257 53,254 49,256 51,259 50,260 50,261 53,263 52,265 54,268 53,268 53,271 55,273 56,274 58,276 60,274 61,276 62,275 65,277 66,280 72,282 76,284 77,287 78,287 78,285 79,285 80,282 81,283 82,282 85,283 87,283 87,286 91,288 94,291 95,291 98,292 101,297 105,295 107,296 108,296 108,301 110,301 110,303 112,303 114,305 117,303 117,304 117,307 119,308 121,308 122,308 123,307 126,313 127,313 126,310 127,310 128,312 130,313 131,310 133,310 138,314 141,313 143,314 144,312 147,313 147,312 150,312 152,310 153,311 154,313 153,318 155,321 157,319 156,318 158,314 161,311 163,309 166,310 167,309 168,310 169,311 171,311 173,311 176,313 177,313 179,311 180,312 182,313 181,314 182,314 181,317 183,318 186,318 186,319 187,320 186,322 187,326 192,324 197,325 204,323 204,322 208,317 211,316 214,315 218,312 219,310 224,308 225,309 228,309 228,310 230,310 236,315 238,313 239,313 240,311 239,311 239,309 241,308 241,305 242,305 244,308 245,307 247,310 248,309 248,307 249,307 249,310 253,309 253,307 251,303 252,303 252,300 253,299 254,302 255,301 255,297 257,297 255,291 256,288 255,279 255,278 252,273 252,271 253,272 254,270 250,265 250,263 248,260 248,259 243,256 239,256 240,259 238,259 239,262 236,262 234,263 233,263 234,266 233,267 230,266 229,264 227,264 228,266 227,268 225,265 224,265 224,267 222,265 221,266 219,263 220,263 220,261 219,261 218,259 216,259 218,259 218,258 215,258 212,255 207,258 204,257 203,256 201,257 198,255 196,255 196,254 188,254 188,252 185,253 181,249 180,250 178,249 177,250 175,250 170,247 166,244 165,241 162,238 164,236 164,234 163,231 163,230 164,229 163,227 161,228 161,225 160,224 161,223 160,222 163,220 162,220 164,216 161,216 160,214 163,213ZM369,231 368,230 368,228 372,219 370,212 370,207 369,206 369,202 372,198 372,197 373,196 373,195 373,192 371,190 371,187 375,183 375,178 377,177 378,174 376,173 377,170 374,171 373,174 371,173 369,174 367,172 368,174 365,175 365,174 365,176 363,177 362,179 359,181 359,182 356,184 355,187 356,189 355,191 353,189 353,194 347,194 346,194 345,192 342,191 342,192 340,193 339,194 339,195 338,198 339,200 338,201 339,203 345,205 346,207 347,207 348,206 350,209 351,208 352,209 352,214 350,216 352,222 345,223 343,222 342,223 344,226 341,227 341,227 338,227 338,228 335,225 331,225 330,226 331,229 329,231 333,234 332,235 331,235 331,237 330,240 331,244 331,244 330,243 327,244 325,243 324,246 323,246 323,247 325,248 325,251 322,252 320,252 321,254 326,252 327,254 330,255 333,254 336,254 336,256 338,258 340,256 340,258 342,258 345,261 348,259 350,260 356,264 358,265 358,266 361,266 362,262 360,259 362,255 366,256 368,255 367,253 363,252 363,250 360,249 361,248 362,247 369,249 371,247 373,249 376,247 376,244 371,240 372,239 371,238 372,236 370,235 371,234 369,231ZM331,217 330,218 331,222 329,223 327,221 327,222 326,221 324,221 326,220 325,220 324,220 322,218 323,217 320,217 319,217 319,214 321,212 319,208 318,207 318,206 319,204 317,203 317,202 315,201 313,199 312,199 312,197 307,197 302,192 300,191 299,189 301,188 300,185 304,182 307,178 306,174 306,172 304,172 299,173 296,176 290,174 285,176 284,176 286,179 283,182 282,182 279,180 277,178 278,177 275,178 274,177 274,173 270,173 271,172 269,171 268,169 264,167 260,167 264,165 267,162 268,157 267,155 262,154 261,155 257,155 257,157 255,156 253,157 254,158 252,156 251,156 252,157 249,158 249,154 245,152 242,148 244,145 237,131 229,132 227,134 225,136 227,138 226,139 227,141 226,142 221,143 218,146 217,144 214,145 213,147 211,147 206,152 204,155 203,157 195,158 192,171 189,175 189,177 197,175 197,178 203,178 204,179 203,180 204,181 209,180 211,185 215,184 220,186 223,185 226,188 228,188 229,186 232,187 232,184 233,184 233,182 236,182 235,179 235,175 239,175 246,180 248,179 248,177 251,178 254,176 257,178 256,179 262,184 267,187 267,187 267,186 266,184 266,183 270,186 275,187 274,190 278,192 279,192 280,191 281,192 284,194 285,193 287,196 292,201 290,201 290,202 293,205 292,205 293,207 294,210 296,211 294,213 295,214 295,216 293,216 292,217 294,219 293,220 291,219 290,221 288,221 288,223 290,224 286,226 286,228 285,228 285,231 287,232 288,234 286,235 285,237 284,237 283,237 281,236 275,234 274,235 273,236 275,240 277,240 277,243 281,242 282,244 284,244 285,245 283,247 284,249 285,248 286,248 287,247 288,248 288,246 290,245 290,244 289,243 289,242 287,239 289,239 290,237 292,237 291,237 295,235 297,237 297,238 297,241 299,242 301,241 301,242 306,242 307,243 308,246 310,247 309,247 309,250 310,250 308,251 308,253 312,255 317,256 320,254 320,252 321,252 324,251 325,248 323,247 323,246 324,246 325,244 325,243 327,244 330,243 331,244 331,244 330,240 331,237 331,235 332,235 333,234 329,231 331,229 330,226 331,225 335,225 338,228 338,227 341,227 341,227 344,226 342,223 343,222 345,223 352,222 350,216 352,214 352,209 351,208 350,209 348,206 347,207 346,207 345,205 339,203 338,201 337,200 332,200 332,202 331,202 332,205 331,205 329,207 331,208 331,211 334,211 335,213 335,215 334,215 334,217 333,218 331,217ZM294,210 293,207 292,205 293,205 290,202 290,201 292,201 291,200 287,196 285,193 284,194 281,192 280,191 279,192 278,192 274,190 275,187 270,186 266,183 266,184 267,186 267,187 267,187 262,184 256,179 257,178 254,176 251,178 248,177 248,179 246,180 239,175 235,175 235,179 236,182 233,182 233,184 232,184 232,187 229,186 228,188 226,188 223,185 220,186 215,184 211,185 209,180 204,181 203,180 204,179 203,178 197,178 197,175 191,176 189,177 178,181 172,181 170,184 167,184 167,186 168,187 171,186 171,193 176,196 179,202 177,202 173,204 173,207 176,208 176,213 175,213 174,214 172,212 168,212 166,211 165,213 160,213 160,215 164,216 162,220 163,220 160,222 161,223 160,224 161,225 161,228 163,227 164,229 163,230 163,231 164,234 164,236 162,238 165,241 165,242 165,242 167,245 173,249 181,249 185,253 188,252 188,254 196,254 196,255 198,255 201,257 203,256 204,257 207,258 212,255 215,258 218,258 218,259 216,259 218,259 219,261 220,261 220,263 219,263 221,266 222,265 224,267 224,265 225,265 228,268 227,264 228,264 229,264 231,266 233,267 234,266 233,263 234,263 236,262 239,262 238,259 240,259 239,256 240,256 243,256 240,254 239,252 241,251 240,249 243,246 241,245 241,244 240,243 239,240 242,239 242,237 244,236 249,237 250,240 252,243 253,247 254,249 257,250 258,252 259,252 263,254 264,250 267,253 266,255 268,255 268,254 269,254 269,254 270,254 272,256 272,255 275,255 277,255 278,253 277,252 277,250 277,248 278,247 279,249 280,248 282,249 283,247 282,246 283,244 282,244 281,242 281,242 277,243 277,240 275,240 273,236 274,235 275,234 277,234 283,237 284,237 285,237 286,235 288,234 287,232 285,231 285,228 286,228 286,226 290,224 288,223 288,221 290,221 291,219 293,220 294,219 292,217 293,216 295,216 295,214 294,213 296,211 294,210ZM338,201 339,200 338,198 339,195 339,194 342,192 340,190 340,190 337,188 335,188 330,186 332,184 333,181 335,178 335,177 334,176 333,173 332,173 331,174 328,174 328,176 327,176 325,179 324,182 324,186 323,188 324,190 323,192 322,192 321,193 319,193 316,195 310,196 308,197 312,197 312,199 313,199 315,201 317,202 317,203 319,204 318,206 318,207 319,208 321,212 319,214 319,217 320,217 323,217 322,218 324,220 325,220 326,220 327,222 327,221 328,221 329,223 331,222 330,218 332,217 333,218 335,216 334,215 335,215 335,212 332,211 331,211 331,208 329,207 330,207 331,205 332,205 331,202 332,202 332,200 338,201ZM229,132 229,130 224,125 221,116 219,116 220,113 215,113 213,112 209,110 208,108 201,105 194,104 188,104 186,103 181,103 177,102 174,102 172,97 173,95 176,92 175,88 176,85 176,85 176,83 175,80 173,80 171,77 169,72 167,71 166,69 163,70 161,67 156,68 155,66 152,66 151,63 145,61 146,59 143,57 145,56 144,53 141,54 140,55 137,54 134,54 133,56 134,57 133,59 131,61 128,62 123,63 121,65 121,67 123,76 121,79 118,79 115,82 113,80 105,80 99,78 96,77 90,92 89,93 88,97 88,98 91,99 91,102 85,101 83,100 74,103 67,104 64,105 65,107 67,106 70,109 69,115 73,123 72,125 73,125 74,127 69,128 72,130 68,131 67,133 68,138 67,138 67,140 65,140 63,142 59,143 52,147 47,148 47,150 44,151 43,153 37,153 36,152 34,153 33,154 31,160 29,161 28,160 25,161 25,162 23,162 23,160 21,157 18,160 14,159 13,160 15,161 13,161 9,164 6,164 4,167 5,170 4,172 2,172 1,173 3,177 4,177 4,178 3,178 2,179 3,182 6,183 7,181 10,182 14,184 14,188 16,192 14,194 15,195 17,196 17,198 15,199 13,198 11,199 10,201 14,201 14,203 16,202 20,202 20,205 22,205 24,206 26,211 25,213 26,214 27,216 29,216 31,215 31,217 33,218 37,220 42,221 44,220 45,221 47,220 46,222 46,223 48,228 48,230 50,232 53,232 54,234 56,234 56,234 57,233 64,233 66,226 69,224 68,223 70,221 75,222 76,221 78,222 79,222 81,223 82,223 86,222 86,221 89,219 89,218 90,217 93,218 95,218 95,220 97,221 102,222 106,221 107,222 110,220 110,220 116,217 118,217 122,218 122,217 126,216 127,212 133,210 137,210 139,209 141,210 150,208 153,210 155,210 163,213 165,213 166,211 168,212 172,212 174,214 177,213 176,208 173,207 173,204 177,202 179,202 178,200 176,196 171,193 171,186 168,187 167,186 167,184 170,184 172,181 178,181 190,177 189,175 192,171 195,158 203,157 204,155 206,152 211,147 213,147 214,145 217,144 218,146 221,143 226,142 227,141 226,139 227,138 225,136 227,134 229,132ZM470,379 472,382 473,386 474,386 476,377 478,375 480,371 482,359 484,354 484,350 486,348 485,346 483,346 481,344 476,348 467,364 466,372 467,373 468,378 470,379ZM462,366 462,365 461,365 461,366 462,366ZM406,379 405,380 406,380 404,381 404,382 405,382 406,381 408,382 408,380 409,381 410,379 409,379 408,379 409,379 408,378 406,379ZM452,516 451,520 453,517 455,507 452,516ZM389,610 383,611 391,609 394,607 389,610ZM367,514 369,509 369,504 368,509 367,514ZM364,467 362,462 358,455 362,462 364,467Z";
+
+/* ---------- 数据 ---------- */
+var DEF=JSON.parse($('#seed').textContent);
+var DATA=null;
+function clone(o){return JSON.parse(JSON.stringify(o));}
+/* 把任何相对图片路径补成绝对路径，避免换目录后 404 */
+function normSrc(x){
+  if(!x) return x;
+  if(/^(https?:|data:|blob:)/i.test(x)) return x;
+  return x.charAt(0)==='/' ? x : '/'+x;
+}
+function normSrcs(d){
+  (d.photos||[]).forEach(function(p){ if(p&&p.src) p.src=normSrc(p.src); });
+  (d.cities||[]).forEach(function(c){
+    (c.photos||[]).forEach(function(x){
+      if(typeof x==='string') return;
+      if(x&&x.src) x.src=normSrc(x.src);
+    });
+  });
+  (d.filmPhotos||[]).forEach(function(p){ if(p&&p.src) p.src=normSrc(p.src); });
+  return d;
+}
+function load(){
+  try{
+    var raw=localStorage.getItem(LS_KEY);
+    if(!raw) return normSrcs(clone(DEF));
+    var d=JSON.parse(raw);
+    if(DEF.rev && d.rev!==DEF.rev){
+      try{ localStorage.removeItem(LS_KEY); }catch(e){}
+      return normSrcs(clone(DEF));
+    }
+    for(var k in DEF){ if(!(k in d)) d[k]=clone(DEF[k]); }
+    return normSrcs(d);
+  }catch(e){ return normSrcs(clone(DEF)); }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(DATA)); return true; }
+  catch(e){ toast('存不下了，删掉几张照片再试'); return false; }
+}
+DATA=load();
+
+/* ---------- 工具 ---------- */
+function setVH(){
+  document.documentElement.style.setProperty('--vh', window.innerHeight+'px');
+}
+setVH();
+window.addEventListener('resize',setVH);
+window.addEventListener('orientationchange',function(){setTimeout(setVH,120);});
+
+function toast(msg){
+  var t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('on');},2200);
+}
+function pad2(n){return n<10?'0'+n:''+n;}
+function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function startTS(){
+  var p=(DATA.startDate||'2025-03-30').split('-');
+  return new Date(+p[0], (+p[1]||1)-1, +p[2]||1, 0,0,0,0).getTime();
+}
+function dateStr(ts){var d=new Date(ts);return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+var CITY_DB={
+"北京":[116.41,39.90],"上海":[121.47,31.23],"广州":[113.26,23.13],"深圳":[114.06,22.55],
+"杭州":[120.15,30.27],"南京":[118.80,32.06],"成都":[104.07,30.57],"重庆":[106.55,29.56],
+"西安":[108.95,34.27],"武汉":[114.31,30.60],"长沙":[112.94,28.23],"苏州":[120.62,31.32],
+"天津":[117.20,39.13],"青岛":[120.38,36.07],"厦门":[118.09,24.48],"大连":[121.62,38.92],
+"哈尔滨":[126.53,45.80],"沈阳":[123.43,41.80],"长春":[125.32,43.82],"济南":[117.00,36.65],
+"郑州":[113.63,34.75],"合肥":[117.28,31.86],"福州":[119.30,26.08],"南昌":[115.89,28.68],
+"南宁":[108.37,22.82],"昆明":[102.83,24.88],"贵阳":[106.63,26.65],"兰州":[103.83,36.06],
+"西宁":[101.78,36.62],"银川":[106.23,38.49],"乌鲁木齐":[87.62,43.82],"拉萨":[91.14,29.65],
+"呼和浩特":[111.75,40.84],"石家庄":[114.50,38.04],"太原":[112.55,37.87],"海口":[110.20,20.04],
+"三亚":[109.51,18.25],"桂林":[110.29,25.27],"丽江":[100.23,26.87],"大理":[100.27,25.61],
+"张家界":[110.48,29.12],"黄山":[118.34,29.71],"无锡":[120.31,31.49],"宁波":[121.55,29.87],
+"温州":[120.70,28.00],"珠海":[113.58,22.27],"佛山":[113.12,23.02],"泉州":[118.58,24.91],"徐州":[117.18,34.26],
+"烟台":[121.39,37.54],"威海":[122.12,37.51],"延吉":[129.51,42.89],"敦煌":[94.66,40.14],
+"喀什":[75.99,39.47],"景洪":[100.80,22.01],"香港":[114.17,22.32],"澳门":[113.55,22.20],
+"台北":[121.52,25.03],"秦皇岛":[119.60,39.94],"洛阳":[112.45,34.62],"开封":[114.31,34.80],
+"扬州":[119.42,32.39],"绍兴":[120.58,30.03],"泉州南":[118.58,24.91],"桂林阳朔":[110.50,24.78]
+};
+
+var proj=function(lng,lat){return [(lng-73.4)*10,(53.6-lat)*10*1.219];};
+
+function renderCityMap(){
+  var prov=$('#mapProv'), dots=$('#mapDots'), box=$('#cityList');
+  if(!prov||!dots) return;
+  if(!prov.firstChild) prov.innerHTML='<path d="'+MAP_D+'"/>';
+  dots.innerHTML='';
+  if(box) box.innerHTML='';
+  var list=DATA.cities||[];
+  list.forEach(function(c,i){
+    var xy=proj(c.lng,c.lat);
+    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','dot a'+(i%4));
+    g.setAttribute('transform','translate('+xy[0].toFixed(1)+','+xy[1].toFixed(1)+')');
+    g.innerHTML='<circle class="hit" r="26"></circle><circle class="halo" r="7"></circle><circle class="core" r="6.5"></circle>';
+    g.addEventListener('click',function(){openCity(i);});
+    dots.appendChild(g);
+    if(box){
+      var d=document.createElement('div');
+      d.className='citychip';
+      var n=(c.photos||[]).length;
+      d.innerHTML='<b>'+esc(c.name)+'</b><i>'+(n?n+' 张':'去过')+'</i>';
+      d.addEventListener('click',function(){openCity(i);});
+      box.appendChild(d);
+    }
+  });
+  scaleDots();
+  if(box && !list.length){
+    box.innerHTML='<div class="maphint">还没点亮城市</div>';
+  }
+}
+
+
+
+/* ---- 地图双指缩放 ---- */
+var MZ={s:1,x:0,y:0};
+var mzPending=false;
+function applyMZ(anim){
+  var svg=$('#cnmap'); if(!svg) return;
+  if(anim){
+    svg.style.transition='transform .3s cubic-bezier(.2,.9,.2,1)';
+    setTimeout(function(){ if(svg) svg.style.transition='none'; },340);
+  } else {
+    svg.style.transition='none';
+  }
+  svg.style.transform='translate3d('+(MZ.x||0).toFixed(1)+'px,'+(MZ.y||0).toFixed(1)+'px,0) scale('+(MZ.s||1).toFixed(3)+')';
+  scaleDots();
+  var rb=$('#mzReset'); if(rb){ if((MZ.s||1)>1.05) rb.classList.add('on'); else rb.classList.remove('on'); }
+}
+function applyMZLazy(){
+  if(mzPending) return;
+  mzPending=true;
+  raf(function(){ mzPending=false; applyMZ(false); });
+}
+/* 缩放时让城市点保持同样大小，避免放大后变成大圆饼 */
+function scaleDots(){
+  var dots=$('#mapDots'); if(!dots) return;
+  var k=1/(MZ.s||1);
+  Array.prototype.forEach.call(dots.children,function(g){
+    var c=g.querySelector('.core'); if(c) c.setAttribute('r',(6.5*k).toFixed(2));
+    var h=g.querySelector('.halo'); if(h) h.setAttribute('r',(7*k).toFixed(2));
+    var t=g.querySelector('.hit'); if(t) t.setAttribute('r',(26*k).toFixed(2));
+  });
+}
+function clampMZ(){
+  var wrap=document.querySelector('.mapwrap'); if(!wrap) return;
+  var w=wrap.clientWidth||300, h=wrap.clientHeight||220;
+  var mx=Math.max(0,(w*(MZ.s-1))/2), my=Math.max(0,(h*(MZ.s-1))/2);
+  MZ.x=Math.max(-mx,Math.min(mx,MZ.x));
+  MZ.y=Math.max(-my,Math.min(my,MZ.y));
+}
+function resetMZ(){ MZ.s=1; MZ.x=0; MZ.y=0; applyMZ(true); scaleDots(); }
+
+(function bindMapZoom(){
+  var wrap=null;
+  function init(){
+    wrap=document.querySelector('.mapwrap');
+    if(!wrap||wrap.__zb) return;
+    wrap.__zb=true;
+    var d0=0,s0=1,ux0=0,uy0=0,tx0=0,ty0=0,drag=false,px=0,py=0,wr=null;
+    function dist2(t){ var dx=t[0].clientX-t[1].clientX, dy=t[0].clientY-t[1].clientY; return Math.sqrt(dx*dx+dy*dy); }
+    function mid2(t){ return {x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2}; }
+    wrap.addEventListener('touchstart',function(e){
+      wr=wrap.getBoundingClientRect();
+      if(e.touches.length===2){
+        e.preventDefault();
+        var r=wr;
+        d0=dist2(e.touches)||1; s0=MZ.s;
+        var c=mid2(e.touches);
+        ux0=c.x-(r.left+r.width/2); uy0=c.y-(r.top+r.height/2);
+        tx0=MZ.x; ty0=MZ.y;
+      } else if(e.touches.length===1 && MZ.s>1.02){
+        drag=true;
+        px=e.touches[0].clientX; py=e.touches[0].clientY;
+        tx0=MZ.x; ty0=MZ.y;
+      }
+    },{passive:false});
+    wrap.addEventListener('touchmove',function(e){
+      if(e.touches.length===2 && d0>0){
+        e.preventDefault();
+        var d=dist2(e.touches);
+        var s=Math.max(1,Math.min(3.0, s0*d/d0));
+        var c=mid2(e.touches);
+        var ux=c.x-(wr.left+wr.width/2), uy=c.y-(wr.top+wr.height/2);
+        var k=s/s0;
+        MZ.x=ux-(ux-tx0)*k;
+        MZ.y=uy-(uy-ty0)*k;
+        MZ.s=s;
+        clampMZ();
+        applyMZLazy();
+      } else if(drag && e.touches.length===1 && MZ.s>1.02){
+        e.preventDefault();
+        MZ.x=tx0+(e.touches[0].clientX-px);
+        MZ.y=ty0+(e.touches[0].clientY-py);
+        clampMZ();
+        applyMZLazy();
+      }
+    },{passive:false});
+    function end(e){
+      if(e.touches && e.touches.length<2){
+        d0=0;
+        if(MZ.s<=1.03){ MZ.s=1; MZ.x=0; MZ.y=0; applyMZ(true); }
+        else { applyMZ(true); }
+      }
+      if(!e.touches || e.touches.length===0) drag=false;
+    }
+    wrap.addEventListener('touchend',end);
+    wrap.addEventListener('touchcancel',end);
+    /* 桌面：滚轮也支持，方便调试 */
+    wrap.addEventListener('wheel',function(e){
+      if(Math.abs(e.deltaY)<4) return;
+      e.preventDefault();
+      MZ.s=Math.max(1,Math.min(3.0, MZ.s+(e.deltaY>0?-0.12:0.12)));
+      if(MZ.s<=1.01){ MZ.x=0; MZ.y=0; }
+      clampMZ(); applyMZ(false);
+    },{passive:false});
+  }
+  on('#mzReset','click',function(e){ e.stopPropagation(); resetMZ(); });
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',init);
+})();
+
+
+/* ---- 查看器手势：一次一张 ---- */
+(function(){
+  function init(){
+    var el=document.querySelector('#lb .lbwrap');
+    if(!el||el.__lbBound) return;
+    el.__lbBound=true;
+    var sx=0,sy=0,base=0;
+    el.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1) return;
+      sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+      LB.dragging=true; LB.axis=null; base=LB.drag;
+      var t=$('#lbShots'); if(t) t.style.transition='none';
+    },{passive:true});
+    el.addEventListener('touchmove',function(e){
+      if(!LB.dragging) return;
+      var dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+      if(!LB.axis){
+        if(Math.abs(dx)>7||Math.abs(dy)>7) LB.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+        else return;
+      }
+      if(LB.axis!=='x') return;
+      e.preventDefault();
+      var d=base-dx/window.innerWidth;
+      if(d>1) d=1+(d-1)*0.22;
+      if(d<-1) d=-1+(d+1)*0.22;
+      LB.drag=d;
+      lbRender();
+    },{passive:false});
+    function end(){
+      if(!LB.dragging) return;
+      LB.dragging=false;
+      var t=LB.cur;
+      if(LB.drag>0.16) t=LB.cur+1;
+      else if(LB.drag<-0.16) t=LB.cur-1;
+      lbGo(t);
+    }
+    el.addEventListener('touchend',end);
+    el.addEventListener('touchcancel',end);
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',init);
+})();
+
+/* ---- 卡片轮播：一次一张，跟手 ---- */
+var DECK={cur:0,n:0,drag:0,dragging:false,axis:null,anim:0,bound:false};
+function deckStep(){ return window.innerWidth*0.45; }
+function axisStep(){ return window.innerWidth*(DECK.n>26?0.125:0.155); }
+
+function renderDeck(){
+  var box=$('#album'); if(!box) return;
+  var cards=box.children;
+  if(!cards.length) return;
+  var step=deckStep(), vw=window.innerWidth;
+  for(var i=0;i<cards.length;i++){
+    var c=cards[i];
+    var p=i-DECK.cur-DECK.drag;
+    var ap=Math.abs(p);
+    if(ap>3.4){ c.style.visibility='hidden'; c.style.pointerEvents='none'; continue; }
+    c.style.visibility='visible';
+    var m=Math.min(ap,3);
+    var y=m*vw*0.018;
+    var sc=1-m*0.055;
+    var op=Math.max(.25,1-m*0.26);
+    c.style.transform='translate3d('+(p*step).toFixed(1)+'px,'+y.toFixed(1)+'px,0) scale('+sc.toFixed(3)+')';
+    c.style.opacity=op.toFixed(2);
+    c.style.zIndex=String(300-Math.round(ap*20));
+    c.style.pointerEvents= ap<0.5 ? 'auto' : 'none';
+    var im=c.querySelector('img');
+    if(im){
+      var ds=im.getAttribute('data-src');
+      if(ds && ap<3 && !im.getAttribute('src')){ im.src=ds; im.removeAttribute('data-src'); }
+    }
+  }
+  renderAxis();
+  var num=$('#deckNum');
+  if(num) num.textContent=String(Math.round(DECK.cur+DECK.drag)+1);
+}
+function renderAxis(){
+  var track=$('#tlTrack'); if(!track) return;
+  var step=axisStep();
+  track.style.transform='translate3d('+(-(DECK.cur+DECK.drag)*step).toFixed(1)+'px,0,0)';
+  var nodes=track.children;
+  var near=Math.round(DECK.cur+DECK.drag);
+  for(var i=0;i<nodes.length;i++){
+    nodes[i].className='tlnode'+(i===near?' on':'');
+  }
+}
+function buildAxis(){
+  var track=$('#tlTrack'); if(!track) return;
+  track.innerHTML='';
+  var step=axisStep();
+  var list=(DATA.photos||[]).filter(function(p){return p&&p.src;});
+  list.forEach(function(p,i){
+    var d=document.createElement('div');
+    d.className='tlnode';
+    d.style.left=(i*step).toFixed(1)+'px';
+    var label=(p.when&&String(p.when).trim())||'';
+    d.innerHTML='<i></i><span>'+esc(label)+'</span>';
+    track.appendChild(d);
+  });
+}
+function goDeck(target){
+  target=Math.max(0,Math.min(DECK.n-1,target));
+  var from=DECK.cur+DECK.drag, t0=performance.now(), dur=330;
+  if(Math.abs(from-target)<0.001){ DECK.drag=0; renderDeck(); return; }
+  DECK.cur=target;
+  var startOff=from-target;
+  (function step(now){
+    var pr=Math.min(1,(now-t0)/dur);
+    var e=1-Math.pow(1-pr,3);
+    DECK.drag=startOff*(1-e);
+    renderDeck();
+    if(pr<1) DECK.anim=raf(step);
+    else { DECK.drag=0; renderDeck(); }
+  })(t0);
+}
+function bindDeck(){
+  var el=$('#deck');
+  if(!el||DECK.bound) return;
+  DECK.bound=true;
+  var sx=0,sy=0,base=0;
+  el.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1) return;
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+    DECK.dragging=true; DECK.axis=null; base=DECK.drag;
+    if(DECK.anim){ cancelAnimationFrame(DECK.anim); DECK.anim=0; }
+  },{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(!DECK.dragging) return;
+    var dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(!DECK.axis){
+      if(Math.abs(dx)>6||Math.abs(dy)>6) DECK.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+      else return;
+    }
+    if(DECK.axis!=='x') return;
+    e.preventDefault();
+    var d=base-dx/deckStep();
+    if(d>1) d=1+(d-1)*0.22;
+    if(d<-1) d=-1+(d+1)*0.22;
+    DECK.drag=d;
+    renderDeck();
+  },{passive:false});
+  function end(){
+    if(!DECK.dragging) return;
+    DECK.dragging=false;
+    var t=DECK.cur;
+    if(DECK.drag>0.16) t=DECK.cur+1;
+    else if(DECK.drag<-0.16) t=DECK.cur-1;
+    goDeck(t);
+  }
+  el.addEventListener('touchend',end);
+  el.addEventListener('touchcancel',end);
+  el.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaX)<Math.abs(e.deltaY)) return;
+    if(e.deltaX>18&&DECK.cur<DECK.n-1) goDeck(DECK.cur+1);
+    else if(e.deltaX<-18&&DECK.cur>0) goDeck(DECK.cur-1);
+  },{passive:true});
+}
+window.addEventListener('resize',function(){ buildAxis(); renderDeck(); });
+window.addEventListener('orientationchange',function(){ setTimeout(function(){ buildAxis(); renderDeck(); },180); });
+
+var LB={cur:0,n:0,drag:0,dragging:false,axis:null,anim:0,bound:false};
+
+function lbRender(){
+  var track=$('#lbShots'); if(!track) return;
+  var pos=LB.cur+LB.drag;
+  track.style.transform='translate3d('+(-pos*100).toFixed(2)+'%,0,0)';
+  var slides=track.children;
+  for(var i=0;i<slides.length;i++){
+    var d=Math.abs(i-pos);
+    if(d<0.55) slides[i].classList.add('near');
+    else slides[i].classList.remove('near');
+  }
+  var c=$('#lbCount');
+  if(c) c.textContent=LB.n>1 ? (Math.min(LB.n,Math.round(pos)+1)+' / '+LB.n) : '';
+}
+function lbGo(target){
+  target=Math.max(0,Math.min(LB.n-1,target));
+  var from=LB.cur+LB.drag;
+  if(Math.abs(from-target)<0.001){ LB.drag=0; lbRender(); return; }
+  LB.cur=target;
+  var off=from-target, t0=performance.now(), dur=320;
+  var track=$('#lbShots');
+  if(track) track.style.transition='none';
+  (function step(now){
+    var pr=Math.min(1,(now-t0)/dur);
+    var e=1-Math.pow(1-pr,3);
+    LB.drag=off*(1-e);
+    lbRender();
+    if(pr<1) LB.anim=raf(step);
+    else {
+      LB.drag=0; lbRender();
+      if(track) track.style.transition='transform .32s cubic-bezier(.2,.9,.2,1)';
+    }
+  })(t0);
+}
+function openGallery(items, idx, title, sub){
+  $('#lbTitle').textContent=title||'';
+  var sb=$('#lbSub');
+  if(sb){ sb.textContent=sub||''; sb.style.display=(sub?'block':'none'); }
+  var track=$('#lbShots'); track.innerHTML='';
+  if(!items||!items.length){
+    track.innerHTML='<div class="lbslide"><div class="lbempty">照片还在路上</div></div>';
+    LB.n=1;
+  } else {
+    items.forEach(function(it){
+      var d=document.createElement('div');
+      d.className='lbslide';
+      d.innerHTML='<img src="'+esc(it.src)+'" alt="">'+
+        (it.note?'<div class="lbcap">'+esc(it.note)+'</div>':'');
+      track.appendChild(d);
+    });
+    LB.n=items.length;
+  }
+  LB.cur=Math.max(0,Math.min(idx||0, LB.n-1));
+  LB.drag=0;
+  if(track) track.style.transition='none';
+  lbRender();
+  setTimeout(function(){ if(track) track.style.transition='transform .32s cubic-bezier(.2,.9,.2,1)'; },20);
+  $('#lb').classList.add('on');
+}
+
+function openCity(i){
+  var c=(DATA.cities||[])[i]; if(!c) return;
+  pushMapTo(i);
+  var shots=(c.photos||[]).map(function(x){ return typeof x==='string'?{src:x}:x; });
+  openGallery(shots, 0, c.name, c.note||'');
+}
+
+/* 镜头推进：让地图朝被点的城市放大 */
+function pushMapTo(i){
+  var wrap=document.querySelector('.mapwrap');
+  var dotEl=document.querySelectorAll('#mapDots .dot')[i];
+  if(!wrap) return;
+  Array.prototype.forEach.call(document.querySelectorAll('.dot.active'),function(e){e.classList.remove('active');});
+  if(dotEl){
+    dotEl.classList.add('active');
+    try{
+      var r=dotEl.getBoundingClientRect(), w=wrap.getBoundingClientRect();
+      if(w.width>10&&w.height>10){
+        var px=r.left+r.width/2, py=r.top+r.height/2;
+        var ox=(px-w.left)/w.width*100, oy=(py-w.top)/w.height*100;
+        wrap.style.transformOrigin=ox.toFixed(2)+'% '+oy.toFixed(2)+'%';
+        var cx=window.innerWidth/2, cy=window.innerHeight*0.40;
+        wrap.style.transform='translate('+(cx-px).toFixed(1)+'px,'+(cy-py).toFixed(1)+'px) scale(2.2)';
+      }
+    }catch(err){}
+  }
+  wrap.classList.add('zoom');
+}
+
+function closeGallery(){
+  $('#lb').classList.remove('on');
+  var wrap=document.querySelector('.mapwrap');
+  if(wrap){ wrap.classList.remove('zoom'); wrap.style.transform=''; }
+  Array.prototype.forEach.call(document.querySelectorAll('.dot.active'),function(e){e.classList.remove('active');});
+}
+
+/* ---------- 天数 ---------- */
+function diff(){
+  var ms=Date.now()-startTS(); if(ms<0) ms=0;
+  var s=Math.floor(ms/1000);
+  return {day:Math.floor(s/86400),hour:Math.floor(s/3600),min:Math.floor(s/60),sec:s};
+}
+
+/* ---------- 渲染 ---------- */
+function renderStatic(){
+  $('#eyebrow').textContent=DATA.eyebrow;
+  var el2=$('#endLine'); if(el2 && DATA.endingText) el2.textContent=DATA.endingText;
+  var lt=$('#leadText'); if(lt) lt.textContent=DATA.leadText||'';
+  var at=$('#addText'); if(at) at.textContent=DATA.addText||'';
+  var ut=$('#unitText'); if(ut) ut.textContent=DATA.unitText||'天';
+  var ct=$('#cityTitle'); if(ct) ct.textContent=DATA.cityTitle||'';
+  var mh=$('#mapHint'); if(mh) mh.textContent=DATA.mapHint||'';
+  var yb=$('#yes'); if(yb) yb.textContent=DATA.yesText||'要';
+  var nb=$('#no'); if(nb) nb.textContent=DATA.noText||'不要';
+  $('#introTip').textContent=DATA.introTip;
+  $('#tlTitle').textContent=DATA.tlTitle;
+  $('#albumTitle').textContent=DATA.albumTitle;
+  $('#dates').textContent=dateStr(startTS())+' — '+dateStr(Date.now());
+  document.title='第 '+(diff().day)+' 天';
+}
+
+function renderTimeline(){
+  var box=$('#tl'); box.innerHTML='';
+  (DATA.timeline||[]).forEach(function(it){
+    var d=document.createElement('div');
+    d.className='ev rv';
+    d.innerHTML='<div class="d">'+esc(it.day)+'</div><div class="t">'+esc(it.title)+
+      (it.sub?'<em>，'+esc(it.sub)+'</em>':'')+'</div>';
+    box.appendChild(d);
+  });
+  // 逐条延迟
+  var acc=0.3;
+  Array.prototype.forEach.call(box.children,function(c){
+    var txt=(c.textContent||'').replace(/\s/g,'');
+    var gap=0.62+Math.min(txt.length,22)*0.062;   /* 按字数给阅读时间 */
+    c.style.transitionDelay=acc.toFixed(2)+'s';
+    acc+=gap;
+  });
+}
+
+function renderAlbum(){
+  var box=$('#album'); box.innerHTML='';
+  var list=(DATA.photos||[]).filter(function(p){return p&&p.src;});
+  if(!list.length){
+    ['放一张我们的合照','放一张你笑的样子','放一张我偷拍的'].forEach(function(txt,k){
+      var d=document.createElement('div');
+      d.className='shot ph-only';
+      d.innerHTML='<b>'+['♡','❀','✧'][k]+'</b><span>'+esc(txt)+'</span>';
+      box.appendChild(d);
+    });
+    return;
+  }
+  list.forEach(function(p,idx){
+    var d=document.createElement('div');
+    d.className='shot';
+    var tilt=(idx%2? 1:-1)*(0.8+((idx*37)%9)/6);   /* -1.6° ~ +1.6° 随机感 */
+    d.innerHTML='<div class="polaroid" style="transform:rotate('+tilt.toFixed(2)+'deg)">'+
+      (idx<2
+        ? '<img decoding="async" alt="" src="'+esc(p.src)+'" onerror="this.style.background=\'#3a2430\'">'
+        : '<img decoding="async" alt="" data-src="'+esc(p.src)+'" onerror="this.style.background=\'#3a2430\'">')+
+      '<div class="pwhen">'+(esc(p.when||''))+'</div>'+
+      '<div class="pdate">'+(esc(p.note||''))+'</div>'+
+      '</div>';
+    d.addEventListener('click',function(){
+      if(Math.abs(DECK.drag)>0.03) return;
+      openGallery(list, idx, DATA.albumTitle);
+    });
+    box.appendChild(d);
+  });
+  DECK.n=list.length;
+  if(DECK.cur>list.length-1) DECK.cur=Math.max(0,list.length-1);
+  buildAxis(); bindDeck(); renderDeck();
+  var tip=$('#albumTip');
+  if(tip) tip.innerHTML='<b id="deckNum">'+(DECK.cur+1)+'</b> / '+list.length+'　左右滑';
+}
+
+function renderDots(n){
+  var box=$('#dots'); box.innerHTML='';
+  if(n<2){ return; }
+  for(var i=0;i<n;i++){
+    var e=document.createElement('i'); if(i===0) e.className='on';
+    box.appendChild(e);
+  }
+}
+
+function renderLetter(){
+  var box=$('#letter'); box.innerHTML='';
+  (DATA.letter||[]).forEach(function(line){
+    var p=document.createElement('p');
+    p.innerHTML=esc(line);
+    box.appendChild(p);
+  });
+  if(DATA.sign){
+    var s=document.createElement('p'); s.className='sign'; s.textContent=DATA.sign;
+    box.appendChild(s);
+  }
+  Array.prototype.forEach.call(box.children,function(c,i){
+    c.style.transitionDelay=(0.1+i*0.55)+'s';
+  });
+}
+
+function renderAsk(){
+  var a=$('#askText');
+  a.innerHTML=esc(DATA.ask).split('\n').join('<br>');
+  var r=$('#reply');
+  r.innerHTML=esc(DATA.reply).split('\n').join('<br>');
+  r.classList.remove('on');
+}
+
+function renderAll(){
+  renderStatic(); renderTimeline(); renderAlbum(); renderCityMap(); renderLetter(); renderAsk();
+  countBig(); checkIn();
+}
+
+/* ---------- 大数字 ---------- */
+var counted=false;
+function countBig(){
+  var el=$('#bigNum');
+  var target=(typeof diff==='function'?diff().day:(DATA.targetDay||600))||0, dur=1400, st=null;
+  if(counted){ el.textContent=target; return; }
+  el.textContent='0';
+  function step(ts){
+    if(!st) st=ts;
+    var p=Math.min(1,(ts-st)/dur);
+    var e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(e*target);
+    if(p<1) raf(step); else counted=true;
+  }
+  raf(step);
+}
+
+/* ---------- 实时数字 ---------- */
+function tick(){
+  var d=diff();
+  $('#cDay').textContent=fmt(d.day);
+  $('#cHour').textContent=fmt(d.hour);
+  $('#cMin').textContent=fmt(d.min);
+  $('#cSec').textContent=fmt(d.sec);
+}
+tick(); setInterval(tick,1000);
+/* bigNum 每分钟跟随真实天数 */
+setInterval(function(){
+  var el=$('#bigNum');
+  if(el&&counted){ try{ el.textContent=diff().day; }catch(e){} }
+},60000);
+
+/* ---------- 出场 ---------- */
+var stage=$('#stage');
+var secs=Array.prototype.slice.call(document.querySelectorAll('section'));
+function checkIn(){
+  var vh=window.innerHeight;
+  secs.forEach(function(s){
+    var r=s.getBoundingClientRect();
+    if(r.top<vh*0.35&&r.bottom>vh*0.35){
+      s.classList.add('in');
+      if(s.id==='s7'){ refreshEndNext(); }
+    }
+  });
+  var s7el=$('#s7');
+  if(s7el){
+    var r7=s7el.getBoundingClientRect();
+    window.__endSecOn = !(r7.bottom<80||r7.top>vh-80);
+  } else { window.__endSecOn=false; }
+  var last=$('#s6');
+  if(last){
+    var lr=last.getBoundingClientRect();
+    window.__lastSecOn = !(lr.bottom<80||lr.top>vh-80);
+    if(!window.__lastSecOn) resetNo();
+    ['#filmBtnWrap','#envWrap','#film'].forEach(function(sel){
+      var el=$(sel); if(!el) return;
+      if(window.__lastSecOn) el.classList.remove('offscreen');
+      else el.classList.add('offscreen');
+    });
+  }
+}
+stage.addEventListener('scroll',function(){raf(checkIn);},{passive:true});
+setTimeout(checkIn,60);
+
+/* ---------- 相册圆点跟随 ---------- */
+on('#album', 'scroll',function(){
+  var box=$('#album');
+  if(!box.children.length) return;
+  var w=box.children[0].getBoundingClientRect().width+ (window.innerWidth*0.04);
+  var idx=Math.round(box.scrollLeft/w);
+  var dots=$('#dots').children;
+  for(var i=0;i<dots.length;i++) dots[i].className=(i===idx?'on':'');
+},{passive:true});
+
+/* ---------- 星空 / 飘心 ---------- */
+var cv=$('#stars'),ctx=cv.getContext('2d');
+var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+var stars=[],floats=[];
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  stars=[];
+  var n=Math.round(W*H/9000);
+  for(var i=0;i<n;i++){
+    stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.25,
+      a:Math.random()*.6+.12,tw:Math.random()*6.28,sp:Math.random()*.02+.006});
+  }
+  fxResize();
+}
+function spawnHeart(){
+  floats.push({x:Math.random()*W,y:H+20,s:Math.random()*10+7,vy:-(Math.random()*.55+.32),
+    vx:(Math.random()-.5)*.28,a:Math.random()*.5+.35,rot:(Math.random()-.5)*.6,vr:(Math.random()-.5)*.012});
+}
+function heartPath(c,x,y,s,rot){
+  c.save();c.translate(x,y);c.rotate(rot||0);c.beginPath();
+  c.moveTo(0,s*.32);
+  c.bezierCurveTo(-s*.62,-s*.28,-s*.34,-s*.92,0,-s*.42);
+  c.bezierCurveTo(s*.34,-s*.92,s*.62,-s*.28,0,s*.32);
+  c.closePath();c.restore();
+}
+var lastSpawn=0;
+function draw(ts){
+  ctx.clearRect(0,0,W,H);
+  for(var i=0;i<stars.length;i++){
+    var st=stars[i]; st.tw+=st.sp;
+    var a=st.a*(0.55+0.45*Math.sin(st.tw));
+    ctx.beginPath();ctx.arc(st.x,st.y,st.r,0,6.2832);
+    ctx.fillStyle='rgba(255,225,238,'+a.toFixed(3)+')';ctx.fill();
+  }
+  var inLast=!!(window.__lastSecOn||window.__endSecOn);
+  var gap=inLast?380:900, cap=inLast?34:22;
+  if(ts-lastSpawn>gap&&floats.length<cap){lastSpawn=ts;spawnHeart();}
+  for(var j=floats.length-1;j>=0;j--){
+    var f=floats[j];
+    f.y+=f.vy;f.x+=f.vx;f.rot+=f.vr;f.a-=0.0022;
+    if(f.y<-40||f.a<=0.02){floats.splice(j,1);continue;}
+    heartPath(ctx,f.x,f.y,f.s,f.rot);
+    ctx.fillStyle='rgba(255,150,185,'+f.a.toFixed(3)+')';ctx.fill();
+  }
+  raf(draw);
+}
+
+/* ---------- 烟花 ---------- */
+var fxEl=$('#fx'),fc=fxEl.getContext('2d');
+function fxResize(){
+  fxEl.width=W*DPR;fxEl.height=H*DPR;fxEl.style.width=W+'px';fxEl.style.height=H+'px';
+  fc.setTransform(DPR,0,0,DPR,0,0);
+}
+var parts=[],fxOn=false;
+var COLORS=['#ff9cbb','#ffd9a0','#ffc7d9','#fff1f5','#ff6f9c','#ffe9b8'];
+function hexA(hex,a){var n=parseInt(hex.slice(1),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a.toFixed(3)+')';}
+function burst(x,y){
+  var base=COLORS[(Math.random()*COLORS.length)|0];
+  for(var i=0;i<46;i++){
+    var ang=(Math.PI*2/46)*i+Math.random()*.2;
+    var sp=Math.random()*5.4+2.2;
+    parts.push({x:x,y:y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1,
+      decay:Math.random()*.012+.008,heart:Math.random()<0.3,
+      c:Math.random()<0.42?base:COLORS[(Math.random()*COLORS.length)|0],
+      s:Math.random()*1.9+1.1});
+  }
+}
+function fxLoop(){
+  if(!fxOn) return;
+  fc.clearRect(0,0,W,H);
+  fc.globalCompositeOperation='lighter';
+  for(var i=parts.length-1;i>=0;i--){
+    var p=parts[i];
+    if(p.type==='bubble'){
+      p.sw=(p.sw||0)+0.04;
+      p.x+=p.vx+Math.sin(p.sw)*0.5;
+      p.y+=p.vy;
+      p.vy=p.vy*0.973-0.02;             /* 先快后慢，最后缓缓上浮 */
+      p.vx*=0.994;
+      /* 左右边界反弹 */
+      if(p.x<p.r){ p.x=p.r; p.vx=Math.abs(p.vx)*0.82; }
+      if(p.x>W-p.r){ p.x=W-p.r; p.vx=-Math.abs(p.vx)*0.82; }
+      /* 撞到顶部就破 */
+      if(p.y<p.r*0.9){ popBubble(p); parts.splice(i,1); continue; }
+      p.life-=p.decay;
+      if(p.life<=0||p.y>H+60){ parts.splice(i,1); continue; }
+      var al=Math.min(1,p.life*1.25);
+      fc.save();
+      fc.globalCompositeOperation='source-over';
+      fc.beginPath();
+      fc.arc(p.x,p.y,p.r,0,6.2832);
+      fc.fillStyle='rgba(255,168,200,'+(al*0.15).toFixed(3)+')';
+      fc.fill();
+      fc.lineWidth=1.2;
+      fc.strokeStyle='rgba(255,205,225,'+(al*0.4).toFixed(3)+')';
+      fc.stroke();
+      fc.beginPath();
+      fc.arc(p.x-p.r*0.32,p.y-p.r*0.36,p.r*0.2,0,6.2832);
+      fc.fillStyle='rgba(255,255,255,'+(al*0.48).toFixed(3)+')';
+      fc.fill();
+      fc.restore();
+      continue;
+    }
+    if(p.type==='ring'){
+      p.x+=p.vx; p.y+=p.vy; p.vx*=0.94; p.vy*=0.94;
+      p.life-=p.decay;
+      if(p.life<=0){ parts.splice(i,1); continue; }
+      fc.save();
+      fc.globalCompositeOperation='source-over';
+      fc.beginPath();
+      fc.arc(p.x,p.y,p.s*(1.6-p.life*0.6),0,6.2832);
+      fc.strokeStyle='rgba(255,196,220,'+(p.life*0.5).toFixed(3)+')';
+      fc.lineWidth=1.4;
+      fc.stroke();
+      fc.restore();
+      continue;
+    }
+    if(p.type==='emoji'){
+      p.sw=(p.sw||0)+0.055;
+      p.x+=p.vx+Math.sin(p.sw)*0.7;
+      p.y+=p.vy; p.vy+=0.058;
+      p.vx*=0.995;
+      p.rot=(p.rot||0)+(p.vr||0); p.life-=p.decay;
+      if(p.life<=0||p.y>H+90){ parts.splice(i,1); continue; }
+      fc.save();
+      fc.globalCompositeOperation='source-over';
+      fc.globalAlpha=Math.min(1,p.life*1.7);
+      fc.translate(p.x,p.y);
+      fc.rotate(p.rot||0);
+      fc.font=p.s+'px serif';
+      fc.textAlign='center';
+      fc.textBaseline='middle';
+      fc.fillText(p.e,0,0);
+      fc.restore();
+      continue;
+    }
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.055;p.vx*=0.988;p.vy*=0.988;p.life-=p.decay;
+    if(p.life<=0){parts.splice(i,1);continue;}
+    if(p.heart){heartPath(fc,p.x,p.y,p.s*4.2,p.vx*0.06);}
+    else{fc.beginPath();fc.arc(p.x,p.y,p.s*p.life,0,6.2832);}
+    fc.fillStyle=hexA(p.c,p.life);fc.fill();
+  }
+  fc.globalCompositeOperation='source-over';
+  raf(fxLoop);
+}
+/* ---- 按住「要」持续撒花 ---- */
+var EMOJI=['❤️','💗','🌸','🌺','💕','🌷','💖','🌼','🎀','✨'];
+var sprayOn=false, sprayTick=null, hapticTick=null;
+
+function btnCenter(){
+  var yb=$('#yes');
+  if(!yb) return {x:W/2, y:H*0.7};
+  var r=yb.getBoundingClientRect();
+  return {x:r.left+r.width/2, y:r.top+r.height/2};
+}
+function emitFlower(count,power){
+  if(!fxOn){ fxOn=true; fxLoop(); }
+  var c=btnCenter();
+  power=power||1;
+  for(var k=0;k<count;k++){
+    var a=Math.random()*6.2832;
+    var sp=(Math.random()*1.6+0.5)*power;
+    parts.push({
+      type:'emoji',
+      e:EMOJI[(Math.random()*EMOJI.length)|0],
+      x:c.x+(Math.random()-0.5)*46,
+      y:c.y+(Math.random()-0.5)*24,
+      vx:Math.cos(a)*sp*2.1,
+      vy:-Math.abs(Math.sin(a))*sp*2.6-Math.random()*1.6-0.8,
+      s:11+Math.random()*15,
+      rot:(Math.random()-0.5)*1.0,
+      vr:(Math.random()-0.5)*0.045,
+      sw:Math.random()*6.2832,
+      life:1,
+      decay:0.0052+Math.random()*0.0032,
+      c:'#fff'
+    });
+  }
+  /* 顶部也飘一些下来 */
+  var fallN=Math.random()<0.55?1:0;
+  for(var f=0;f<fallN;f++){
+    parts.push({
+      type:'emoji',
+      e:'💗',
+      x:Math.random()*W,
+      y:-24-Math.random()*40,
+      vx:(Math.random()-0.5)*0.5,
+      vy:0.8+Math.random()*1.1,
+      s:12+Math.random()*12,
+      rot:(Math.random()-0.5)*0.7,
+      vr:(Math.random()-0.5)*0.03,
+      sw:Math.random()*6.28,
+      life:1,
+      decay:0.0032+Math.random()*0.0018,
+      c:'#fff'
+    });
+  }
+}
+
+function startSpray(){
+  if(sprayOn) return;
+  sprayOn=true;
+  var yb=$('#yes'); if(yb) yb.classList.add('pressing');
+  var rp=$('#reply'); if(rp) rp.classList.add('on');
+  emitFlower(3,1);
+  sprayTick=setInterval(function(){ if(sprayOn) emitFlower(1,0.9); },160);
+  hapticTick=setInterval(function(){ if(navigator.vibrate&&sprayOn){ try{navigator.vibrate(26);}catch(e){} } },210);
+}
+function stopSpray(){
+  if(!sprayOn) return;
+  sprayOn=false;
+  var yb=$('#yes'); if(yb) yb.classList.remove('pressing');
+  if(sprayTick){ clearInterval(sprayTick); sprayTick=null; }
+  if(hapticTick){ clearInterval(hapticTick); hapticTick=null; }
+  emitFlower(16,2.2);
+  if(navigator.vibrate){ try{ navigator.vibrate([16,45,16]); }catch(e){} }
+  showFilmBtn();
+}
+
+on('#yes','touchstart',function(e){ e.preventDefault(); startSpray(); },{passive:false});
+on('#yes','touchend',function(e){ e.preventDefault(); stopSpray(); },{passive:false});
+on('#yes','touchcancel',stopSpray);
+on('#yes','mousedown',function(e){ e.preventDefault(); startSpray(); });
+on('#yes','mouseup',stopSpray);
+on('#yes','mouseleave',stopSpray);
+on('#yes','click',function(e){ e.preventDefault(); startSpray(); setTimeout(stopSpray,260); });
+
+
+
+
+/* ---- 泡泡机 ---- */
+var bubbleTick=null;
+function emitBubble(count){
+  if(!fxOn){ fxOn=true; fxLoop(); }
+  var b=$('#filmBtn');
+  var c=b?b.getBoundingClientRect():{left:0,top:0,width:0,height:0};
+  var bx=c.left+c.width/2, by=c.top+c.height/2;
+  var alive=0;
+  for(var z=0;z<parts.length;z++){ if(parts[z].type==='bubble') alive++; }
+  if(alive>70) return;                       /* 上限，防止低端机掉帧 */
+  for(var i=0;i<count;i++){
+    var ang=-Math.PI/2+(Math.random()-0.5)*2.6;   /* 主要朝上半区散开 */
+    var sp=Math.random()*2.6+1.8;
+    parts.push({
+      type:'bubble',
+      x:bx+(Math.random()-0.5)*50,
+      y:by+(Math.random()-0.5)*18,
+      vx:Math.cos(ang)*sp*1.15,
+      vy:Math.sin(ang)*sp,
+      r:7+Math.random()*20,
+      sw:Math.random()*6.2832,
+      life:1,
+      decay:0.0012+Math.random()*0.0011
+    });
+  }
+}
+function popBubble(p){
+  /* 破碎：一圈扩散环 */
+  for(var i=0;i<8;i++){
+    var a=(Math.PI*2/8)*i;
+    parts.push({
+      type:'ring',
+      x:p.x+Math.cos(a)*p.r*0.6,
+      y:p.y+Math.sin(a)*p.r*0.6,
+      vx:Math.cos(a)*1.6,
+      vy:Math.sin(a)*1.6,
+      s:p.r*0.34,
+      life:1, decay:0.075, c:'#ffc4dc'
+    });
+  }
+}
+
+function startBubble(){
+  emitBubble(4);
+  if(bubbleTick) clearInterval(bubbleTick);
+  bubbleTick=setInterval(function(){ emitBubble(1); },120);
+}
+function stopBubble(){
+  if(bubbleTick){ clearInterval(bubbleTick); bubbleTick=null; }
+}
+
+
+/* ---- 未来的信封 ---- */
+var ENV_KEY='anniv_future_note';
+function envLoad(){
+  var v='';
+  try{ v=localStorage.getItem(ENV_KEY)||''; }catch(e){}
+  var inp=$('#envInput');
+  if(inp&&v){ inp.value=v; }
+  var sv=$('#envSaved');
+  if(sv&&v){ sv.textContent='已经写好了'; }
+}
+function showEnvelope(){
+  var w=$('#envWrap'); if(!w) return;
+  setTimeout(function(){
+    w.classList.add('on');
+    var tip=$('#lockTip');
+    if(tip && $('#s7').classList.contains('locked')) tip.classList.add('on');
+  },1400);
+}
+on('#env','click',function(){
+  var e=$('#env'); if(e) e.classList.add('open');
+  var tp=$('#envTap'); if(tp) tp.style.display='none';
+  var n=$('#envNote'); if(n) n.classList.add('on');
+});
+on('#envInput','input',function(ev){
+  try{ localStorage.setItem(ENV_KEY, ev.target.value); }catch(e){}
+  var sv=$('#envSaved');
+  if(sv) sv.textContent = ev.target.value ? '记下了，等那天真的去' : '点开信封，写下下一站';
+});
+
+function sealEnvelope(){
+  var note=$('#envNote'); if(note) note.classList.remove('on');
+  var env=$('#env');
+  setTimeout(function(){
+    if(env) env.classList.remove('open');          /* 封口合回去 */
+    setTimeout(function(){
+      if(env) env.classList.add('flying');          /* 缩小飞向远方 */
+      setTimeout(function(){
+        var w=$('#envWrap'); if(w) w.classList.add('revealed');
+        refreshEndNext();
+        markSealed();
+        toast('信封收好了 · 往下滑看结尾');
+      },900);
+    },460);
+  },380);
+}
+on('#envDone','click',function(e){ e.stopPropagation(); sealEnvelope(); });
+on('#envInput','keydown',function(e){
+  if(e.key==='Enter'||e.keyCode===13){ e.preventDefault(); try{ e.target.blur(); }catch(err){} sealEnvelope(); }
+});
+
+/* ---- 封好信封后才放行最后一屏 ---- */
+var SEAL_KEY='anniv_env_sealed';
+function unlockEnd(){
+  var s7=$('#s7'); if(s7) s7.classList.remove('locked');
+  var tip=$('#lockTip'); if(tip) tip.classList.remove('on');
+}
+function markSealed(){
+  try{ localStorage.setItem(SEAL_KEY,'1'); }catch(e){}
+  unlockEnd();
+}
+function checkUnlock(){
+  var done=false;
+  try{ done=localStorage.getItem(SEAL_KEY)==='1'; }catch(e){}
+  if(done) unlockEnd();
+}
+/* THE END 屏：点一下回到开头 */
+on('#s7','click',function(){
+  var stage=$('#stage'); if(stage) stage.scrollTo({top:0,behavior:'smooth'});
+});
+
+/* ---- THE END 屏显示她写的那句 ---- */
+function refreshEndNext(){
+  var box=$('#endNext'); if(!box) return;
+  var v='';
+  try{ v=localStorage.getItem(ENV_KEY)||''; }catch(e){}
+  v=String(v).trim();
+  if(v){
+    box.innerHTML='下一次，我们去看 <b>'+esc(v)+'</b>';
+  } else {
+    box.innerHTML='<b style="font-size:5vw">我会带你去任何想去的地方</b>';
+  }
+}
+/* ---- 按住我：放映 ---- */
+var projOn=false;
+function showFilmBtn(){
+  var w=$('#filmBtnWrap'); if(!w) return;
+  setTimeout(function(){
+    var yes=$('#yes');
+    var r=yes?yes.getBoundingClientRect():null;
+    var wr=w.getBoundingClientRect();
+    if(r && wr.width>0){
+      var dx=(r.left+r.width/2)-(wr.left+wr.width/2);
+      var dy=(r.top+r.height/2)-(wr.top+wr.height/2);
+      w.style.transition='none';
+      w.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale(.86)';
+      w.classList.add('on');
+      raf(function(){
+        w.style.transition='transform .78s cubic-bezier(.22,.9,.2,1),opacity .5s ease';
+        w.style.transform='translate(0,0) scale(1)';
+        if(yes){
+          yes.style.transition='opacity .45s ease,transform .45s ease';
+          yes.style.opacity='0';
+          yes.style.transform='scale(.6)';
+        }
+      });
+    } else {
+      w.classList.add('on');
+    }
+  },620);
+}
+function startProjection(){
+  if(projOn) return;
+  projOn=true;
+  var b=$('#filmBtn'); if(b) b.classList.add('pressing');
+  var n=$('#no'); if(n) n.style.display='none';      /* 第一次按住就收走「不要」 */
+  startFilm();
+  startBubble();                     /* 同时喷泡泡，不震动 */
+}
+function stopProjection(){
+  if(!projOn) return;
+  projOn=false;
+  var b=$('#filmBtn'); if(b) b.classList.remove('pressing');
+  stopFilm();
+  stopBubble();
+  showEnvelope();
+}
+on('#filmBtn','touchstart',function(e){ e.preventDefault(); startProjection(); },{passive:false});
+on('#filmBtn','touchend',function(e){ e.preventDefault(); stopProjection(); },{passive:false});
+on('#filmBtn','touchcancel',stopProjection);
+on('#filmBtn','mousedown',function(e){ e.preventDefault(); startProjection(); });
+on('#filmBtn','mouseup',stopProjection);
+on('#filmBtn','mouseleave',stopProjection);
+on('#filmBtn','click',function(e){ e.preventDefault(); startProjection(); setTimeout(stopProjection,600); });
+
+/* ---- 放映机：照片从右往左滑 ---- */
+var filmRAF=null, filmX=0, filmBuilt=false, filmLast=0;
+var FILM_SPEED=52;   /* px / 秒 */
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function filmPool(){
+  var mine=(DATA.filmPhotos||[]).filter(function(x){return x&&x.src;});
+  if(mine.length) return mine;
+  return (DATA.photos||[]).filter(function(x){return x&&x.src;});
+}
+function buildFilm(){
+  var track=$('#filmTrack'); if(!track) return;
+  track.innerHTML='';
+  var pool=filmPool();
+  if(!pool.length) return;
+  var pick=shuffle(pool.slice()).slice(0,20);   /* 每次随机 20 张 */
+  var html='';
+  for(var pass=0;pass<2;pass++){
+    pick.forEach(function(p){
+      html+='<img loading="eager" alt="" src="'+esc(p.src)+'">';
+    });
+  }
+  track.innerHTML=html;
+  filmBuilt=true;
+}
+var filmOuter=1, filmAnim=null;   /* 1=右侧外面 0=正中 -1=左侧外面 */
+function applyFilmOuter(){
+  var f=$('#film'); if(!f) return;
+  var w=(window.innerWidth||390)*1.06;
+  f.style.transform='translate3d('+(filmOuter*w).toFixed(1)+'px,0,0)';
+}
+function animateFilmOuter(to,dur,cb){
+  if(filmAnim){ cancelAnimationFrame(filmAnim); filmAnim=null; }
+  var from=filmOuter, t0=performance.now();
+  function step(){
+    var p=Math.min(1,(performance.now()-t0)/dur);
+    var e;
+    if(to>from){
+      e = 1-Math.pow(1-p,3);                       /* 从右进来：缓出 */
+    } else {
+      e = (p<0.5) ? (2*p*p) : (1-Math.pow(-2*p+2,2)/2);  /* 往左出去：先慢后快再缓 */
+    }
+    filmOuter = from+(to-from)*e;
+    applyFilmOuter();
+    if(p<1) filmAnim=raf(step);
+    else { filmAnim=null; if(cb) cb(); }
+  }
+  step();
+}
+function startFilm(){
+  var film=$('#film'); if(!film) return;
+  clearTimeout(stopFilm._t);
+  filmX=0;
+  var tr=$('#filmTrack'); if(tr) tr.style.transform='translate3d(0,0,0)';
+  buildFilm();
+  film.classList.add('on');
+  if(filmOuter<-0.001) filmOuter=0.15;      /* 若正在往左走，从当前位置回来 */
+  animateFilmOuter(0, 900);                  /* 从右边缓缓进来 */
+  if(filmRAF) return;
+  filmLast=0;
+  (function loop(ts){
+    if(!filmLast) filmLast=ts;
+    var dt=Math.min((ts-filmLast)/1000,0.05); filmLast=ts;
+    filmX-=FILM_SPEED*dt;
+    var track=$('#filmTrack');
+    var half=(track?track.scrollWidth:0)/2;
+    if(half>10 && -filmX>=half){ filmX+=half; flashFilm(); }
+    if(track) track.style.transform='translate3d('+filmX.toFixed(1)+'px,0,0)';
+    filmRAF=raf(loop);
+  })(0);
+}
+function stopFilm(){
+  var film=$('#film'); if(!film) return;
+  clearTimeout(stopFilm._t);
+  animateFilmOuter(-1, 1000, function(){    /* 从当前位置继续往左走 */
+    if(film) film.classList.remove('on');
+    if(filmRAF){ cancelAnimationFrame(filmRAF); filmRAF=null; }
+    filmX=0;
+    var t=$('#filmTrack');
+    if(t) t.style.transform='translate3d(0,0,0)';
+    filmOuter=1;
+    applyFilmOuter();
+  });
+}
+function flashFilm(){
+  var f=$('#film'); if(!f) return;
+  f.classList.add('flash');
+  setTimeout(function(){ if(f) f.classList.remove('flash'); },520);
+}
+/* ---- 「不要」按钮逃跑 ---- */
+function dodgeNo(){
+  var b=$('#no'); var sec=$('#s6');
+  if(!b||!sec) return;
+  var sr=sec.getBoundingClientRect();
+  var bw=b.offsetWidth||90, bh=b.offsetHeight||44;
+  b.classList.add('dodged');
+  b.style.position='absolute';
+  b.style.left=(20+Math.random()*Math.max(20, sr.width-bw-44))+'px';
+  b.style.top=(80+Math.random()*Math.max(20, sr.height-bh-160))+'px';
+  b.style.margin='0';
+}
+function resetNo(){
+  var b=$('#no'); if(!b||!b.classList.contains('dodged')) return;
+  b.classList.remove('dodged');
+  b.style.position=''; b.style.left=''; b.style.top=''; b.style.margin='';
+}
+on('#no','touchstart',function(e){ e.preventDefault(); dodgeNo(); });
+on('#no','mouseover',function(){ dodgeNo(); });
+on('#no','click',function(e){ e.preventDefault(); dodgeNo(); });
+
+resize();
+window.addEventListener('resize',function(){resize();});
+raf(draw);
+
+/* ---------- 背景音乐 ---------- */
+var bgmEl=null, musicOn=false, fadeRAF=0, playTried=0;
+function startMusic(){
+  if(!bgmEl) bgmEl=$('#bgm');
+  if(!bgmEl||musicOn) return;
+  musicOn=true;
+  var mu=$('#mute'); if(mu) mu.textContent='♫';
+  bgmEl.volume=0;
+  var pr=bgmEl.play();
+  if(pr&&pr.catch){
+    pr.catch(function(){
+      // 被浏览器拦下：等能播时再试一次
+      bgmEl.addEventListener('canplay',function once(){
+        bgmEl.removeEventListener('canplay',once);
+        setTimeout(function(){ if(musicOn) bgmEl.play().catch(function(){}); },120);
+      });
+    });
+  }
+  var t0=0;
+  (function fadeIn(ts){
+    if(!musicOn) return;
+    if(!t0) t0=ts;
+    var k=Math.min(1,(ts-t0)/2600);
+    bgmEl.volume=Math.min(1,k*0.95);
+    if(k<1) fadeRAF=raf(fadeIn);
+  })(0);
+}
+function stopMusic(){
+  musicOn=false;
+  if(bgmEl) bgmEl.pause();
+  var mu=$('#mute'); if(mu) mu.textContent='♪';
+}
+on('#mute','click',function(){
+  if(!musicOn) startMusic(); else stopMusic();
+});
+document.addEventListener('visibilitychange',function(){
+  if(!bgmEl) return;
+  if(document.hidden&&musicOn){ try{bgmEl.pause();}catch(e){} }
+  else if(!document.hidden&&musicOn&&bgmEl.paused){ try{bgmEl.play();}catch(e){} }
+});
+
+/* ---------- 开场 ---------- */
+on('#tapgate', 'click',function(){
+  $('#intro').classList.add('gone');
+  startMusic();
+  setTimeout(checkIn,150);
+},{once:true});
+
+/* ---------- 编辑器 ---------- */
+var editing=false;
+function fillEditor(){
+  if(!$('#editor')) return;
+  $('#fStart').value=DATA.startDate;
+  $('#fTarget').value=DATA.targetDay;
+  $('#fEyebrow').value=DATA.eyebrow;
+  $('#fIntroTip').value=DATA.introTip;
+  $('#fTlTitle').value=DATA.tlTitle;
+  $('#fAlbumTitle').value=DATA.albumTitle;
+  $('#fLeadText').value=DATA.leadText||'';
+  $('#fAddText').value=DATA.addText||'';
+  $('#fUnitText').value=DATA.unitText||'天';
+  $('#fCityTitle').value=DATA.cityTitle||'';
+  $('#fMapHint').value=DATA.mapHint||'';
+  $('#fEnding').value=DATA.endingText||'';
+  $('#fYesText').value=DATA.yesText||'要';
+  $('#fNoText').value=DATA.noText||'不要';
+  $('#fLetter').value=(DATA.letter||[]).join('\n');
+  $('#fSign').value=DATA.sign;
+  $('#fAsk').value=DATA.ask;
+  $('#fReply').value=DATA.reply;
+  renderETl(); renderEThumbs(); renderCityPick(''); renderECities(); renderEFilm();
+}
+function renderETl(){
+  var box=$('#eTl'); if(!box) return;
+  box.innerHTML='';
+  (DATA.timeline||[]).forEach(function(it,i){
+    var d=document.createElement('div'); d.className='item';
+    d.innerHTML='<div class="top"><span>第 '+(i+1)+' 条</span><button class="del" data-i="'+i+'">删除</button></div>'+
+      '<div class="field"><label>标签（如 DAY 100）</label><input data-k="day" data-i="'+i+'" value="'+esc(it.day)+'"></div>'+
+      '<div class="field"><label>发生了什么</label><input data-k="title" data-i="'+i+'" value="'+esc(it.title)+'"></div>'+
+      '<div class="field" style="margin-bottom:0"><label>补一句（可留空）</label><input data-k="sub" data-i="'+i+'" value="'+esc(it.sub||'')+'"></div>';
+    box.appendChild(d);
+  });
+  box.addEventListener('input',tlInput,false);
+  box.addEventListener('click',tlClick,false);
+}
+function tlInput(e){
+  var el=e.target, k=el.getAttribute('data-k'), i=+el.getAttribute('data-i');
+  if(k===null||isNaN(i)) return;
+  DATA.timeline[i][k]=el.value;
+  autoSave();
+}
+function tlClick(e){
+  if(!e.target.classList.contains('del')) return;
+  var i=+e.target.getAttribute('data-i');
+  DATA.timeline.splice(i,1); renderETl();
+}
+function renderEThumbs(){
+  var box=$('#eThumbs'); if(!box) return;
+  box.innerHTML='';
+  var list=DATA.photos||[];
+  list.forEach(function(p,i){
+    var d=document.createElement('div'); d.className='th';
+    d.innerHTML='<img src="'+esc(p.src)+'" alt="">'+
+      '<button class="del" data-i="'+i+'">×</button>'+
+      '<button class="del thwhen" data-when="'+i+'">'+(p.when?esc(p.when):'时间')+'</button>'+
+      '<div class="thbar">'+
+        '<span class="nte">'+esc(p.note||'（无配文）')+'</span>'+
+        '<button class="mv" data-mv="-1" data-i="'+i+'"'+(i===0?' disabled':'')+'>←</button>'+
+        '<button class="mv" data-mv="1" data-i="'+i+'"'+(i===list.length-1?' disabled':'')+'>→</button>'+
+      '</div>';
+    d.querySelector('img').addEventListener('click',function(){
+      var v=prompt('给这张照片写一句话（留空则只显示照片）：',p.note||'');
+      if(v!==null){ DATA.photos[i].note=v; renderEThumbs(); renderAlbum(); save(); }
+    });
+    box.appendChild(d);
+  });
+  if(!box.__bound){
+    box.__bound=true;
+    box.addEventListener('click',function(e){
+      var t=e.target;
+      if(t.hasAttribute&&t.hasAttribute('data-mv')){
+        movePhoto(+t.getAttribute('data-i'), +t.getAttribute('data-mv'));
+        return;
+      }
+      if(t.hasAttribute&&t.hasAttribute('data-when')){
+        var wi=+t.getAttribute('data-when');
+        var v=prompt('时间轴上显示的文字（留空则显示序号）：',(DATA.photos[wi]&&DATA.photos[wi].when)||'');
+        if(v!==null){ DATA.photos[wi].when=v; renderEThumbs(); renderAlbum(); save(); }
+        return;
+      }
+      if(t.classList&&t.classList.contains('del')){
+        var i2=+t.getAttribute('data-i');
+        DATA.photos.splice(i2,1); renderEThumbs(); renderAlbum(); save();
+      }
+    },false);
+  }
+}
+
+function movePhoto(i,dir){
+  var list=DATA.photos||[];
+  var j=i+dir;
+  if(j<0||j>=list.length) return;
+  var tmp=list[i]; list[i]=list[j]; list[j]=tmp;
+  renderEThumbs(); renderAlbum(); save();
+  toast('已'+(dir<0?'前移':'后移')+'，现在是第 '+(j+1)+' 张');
+}
+
+
+/* ---- 编辑器：放映机图片 ---- */
+function renderEFilm(){
+  var box=$('#eFilm'); if(!box) return;
+  box.innerHTML='';
+  var list=DATA.filmPhotos||[];
+  if(!list.length){
+    box.innerHTML='<div class="tipx" style="grid-column:1/-1;margin:0">还没加。现在放映用的是「回忆」里的照片。</div>';
+    return;
+  }
+  list.forEach(function(p,i){
+    var d=document.createElement('div'); d.className='th';
+    d.innerHTML='<img src="'+esc(p.src)+'" alt="">'+
+      '<button class="del" data-fdel="'+i+'">×</button>'+
+      '<div class="thbar"><span class="nte">第 '+(i+1)+' 张</span>'+
+      '<button class="mv" data-fmv="-1" data-fi="'+i+'"'+(i===0?' disabled':'')+'>←</button>'+
+      '<button class="mv" data-fmv="1" data-fi="'+i+'"'+(i===list.length-1?' disabled':'')+'>→</button></div>';
+    box.appendChild(d);
+  });
+  if(!box.__bound){
+    box.__bound=true;
+    box.addEventListener('click',function(e){
+      var t=e.target;
+      if(t.hasAttribute&&t.hasAttribute('data-fmv')){
+        var i=+t.getAttribute('data-fi'), dir=+t.getAttribute('data-fmv');
+        var l=DATA.filmPhotos||[], j=i+dir;
+        if(j<0||j>=l.length) return;
+        var tmp=l[i]; l[i]=l[j]; l[j]=tmp;
+        renderEFilm(); save();
+        return;
+      }
+      if(t.hasAttribute&&t.hasAttribute('data-fdel')){
+        var k=+t.getAttribute('data-fdel');
+        DATA.filmPhotos.splice(k,1); renderEFilm(); save();
+      }
+    });
+  }
+}
+on('#addFilm','click',function(){ var f=$('#filmInput'); if(f) f.click(); });
+on('#filmInput','change',function(e){
+  var files=Array.prototype.slice.call(e.target.files||[]);
+  e.target.value='';
+  if(!files.length) return;
+  DATA.filmPhotos=DATA.filmPhotos||[];
+  toast('处理 '+files.length+' 张…');
+  var q=files.slice();
+  (function next(){
+    if(!q.length){ renderEFilm(); save(); toast('已加入 '+files.length+' 张'); return; }
+    compress(q.shift(),function(uri){
+      if(uri) DATA.filmPhotos.push({src:uri});
+      setTimeout(next,60);
+    });
+  })();
+});
+
+
+/* ---- 导出完整数据（含照片顺序/时间） ---- */
+function buildFullData(){
+  var d=clone(DATA);
+  d.photos=(d.photos||[]).map(function(p){ return {src:p.src,note:p.note||'',when:p.when||''}; });
+  d.filmPhotos=(d.filmPhotos||[]).map(function(p){ return {src:p.src,note:p.note||''}; });
+  d.cities=(d.cities||[]).map(function(c){
+    return {name:c.name,lng:c.lng,lat:c.lat,note:c.note||'',
+            photos:(c.photos||[]).map(function(x){ return typeof x==='string'?{src:x,note:''}:{src:x.src,note:x.note||''}; })};
+  });
+  return JSON.stringify(d,null,1);
+}
+on('#eExportAll','click',function(){
+  var box=$('#tlbox'); if(!box) return;
+  box.querySelector('.tb b').textContent='全部数据';
+  var txt=buildFullData();
+  $('#tlboxText').value=txt;
+  box.classList.add('on');
+  toast('共 '+Math.round(txt.length/1024)+' KB，复制发我');
+});
+/* ---- 编辑器：城市 ---- */
+var cityIdx=-1;
+function renderCityPick(kw){
+  var box=$('#cityPick'); if(!box) return;
+  kw=(kw||'').trim();
+  box.innerHTML='';
+  var used={}; (DATA.cities||[]).forEach(function(c){used[c.name]=1;});
+  var names=Object.keys(CITY_DB).filter(function(n){
+    return !used[n] && (!kw || n.indexOf(kw)>=0);
+  }).slice(0,16);
+  if(!names.length){ box.innerHTML='<div class="tipx">没有更多匹配的城市了</div>'; return; }
+  names.forEach(function(n){
+    var b=document.createElement('button');
+    b.className='citychip'; b.style.fontFamily='inherit';
+    b.innerHTML='<b>'+n+'</b><i>+</i>';
+    b.addEventListener('click',function(){
+      DATA.cities=DATA.cities||[];
+      DATA.cities.push({name:n,lng:CITY_DB[n][0],lat:CITY_DB[n][1],note:'',photos:[]});
+      renderCityPick($('#citySearch')?$('#citySearch').value:'');
+      renderECities(); renderCityMap(); save();
+    });
+    box.appendChild(b);
+  });
+}
+function renderECities(){
+  var box=$('#eCities'); if(!box) return;
+  box.innerHTML='';
+  var list=DATA.cities||[];
+  if(!list.length){ box.innerHTML='<div class="tipx">还没有城市，上面点一个加上。</div>'; return; }
+  list.forEach(function(c,i){
+    var n=(c.photos||[]).length;
+    var d=document.createElement('div'); d.className='item';
+    d.innerHTML='<div class="top"><span>'+esc(c.name)+' · '+n+' 张照片</span>'+
+      '<button class="del" data-i="'+i+'">删除</button></div>'+
+      '<div class="field"><label>这个城市的一句话</label>'+
+      '<input data-k="note" data-i="'+i+'" value="'+esc(c.note||'')+'"></div>'+
+      '<button class="add" data-add="'+i+'" style="padding:2.8vw">+ 给 '+esc(c.name)+' 加照片</button>';
+    box.appendChild(d);
+  });
+}
+on('#citySearch','input',function(e){ renderCityPick(e.target.value); });
+on('#eCities','input',function(e){
+  var el=e.target, k=el.getAttribute('data-k'), i=+el.getAttribute('data-i');
+  if(k!=='note'||isNaN(i)||!DATA.cities[i]) return;
+  DATA.cities[i].note=el.value;
+  autoSave();
+});
+on('#eCities','click',function(e){
+  var t=e.target;
+  if(t.hasAttribute&&t.hasAttribute('data-add')){
+    cityIdx=+t.getAttribute('data-add');
+    var f=$('#cityFile'); if(f) f.click();
+    return;
+  }
+  if(t.classList&&t.classList.contains('del')){
+    var i=+t.getAttribute('data-i');
+    DATA.cities.splice(i,1);
+    renderCityPick($('#citySearch')?$('#citySearch').value:'');
+    renderECities(); renderCityMap(); save();
+  }
+});
+on('#cityFile','change',function(e){
+  var files=Array.prototype.slice.call(e.target.files||[]);
+  e.target.value='';
+  if(!files.length||cityIdx<0) return;
+  var target=DATA.cities[cityIdx];
+  if(!target){ return; }
+  target.photos=target.photos||[];
+  toast('处理 '+files.length+' 张…');
+  var q=files.slice();
+  (function next(){
+    if(!q.length){ renderECities(); renderCityMap(); save(); toast('已加入 '+files.length+' 张'); return; }
+    compress(q.shift(),function(uri){
+      if(uri) target.photos.push(uri);
+      setTimeout(next,60);
+    });
+  })();
+});
+
+/* ---- 照片查看器 ---- */
+on('#lbClose','click',closeGallery);
+on('#lb','click',function(e){ if(e.target&&e.target.id==='lb') closeGallery(); });
+
+
+/* ---- 时间清单 ---- */
+function photoKey(src){
+  return String(src||'').replace(/^\/?img\//,'').replace(/\.[a-zA-Z0-9]+$/,'');
+}
+function buildTimeList(){
+  var out=[];
+  (DATA.photos||[]).forEach(function(p){
+    var k=photoKey(p.src);
+    while(k.length<8) k+=' ';
+    var note=String(p.note||'').slice(0,14);
+    out.push(k+' = '+((p.when||'')+'        ').slice(0,8)+' '+note);
+  });
+  return out.join('\n');
+}
+on('#eTimeList','click',function(){
+  var box=$('#tlbox'); if(!box) return;
+  box.querySelector('.tb b').textContent='时间清单';
+  $('#tlboxText').value=buildTimeList();
+  box.classList.add('on');
+});
+on('#tlboxClose','click',function(){ $('#tlbox').classList.remove('on'); });
+on('#tlboxCopy','click',function(){
+  var ta=$('#tlboxText');
+  ta.focus(); ta.select(); ta.setSelectionRange(0,ta.value.length);
+  var ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(function(){ toast('已复制'); })
+      .catch(function(){ toast(ok?'已复制':'请长按文字手动复制'); });
+  } else {
+    toast(ok?'已复制':'请长按文字手动复制');
+  }
+});
+
+
+/* ---- 导出全部文字 ---- */
+function buildAllText(){
+  var o=[];
+  o.push('==时间线==');
+  (DATA.timeline||[]).forEach(function(t){
+    o.push((t.day||'')+'|'+(t.title||'')+'|'+(t.sub||''));
+  });
+  o.push('==情书==');
+  (DATA.letter||[]).forEach(function(l){ o.push(l); });
+  o.push('==落款=='+(DATA.sign||''));
+  o.push('==提问==');
+  o.push(DATA.ask||'');
+  o.push('==回答==');
+  o.push(DATA.reply||'');
+  o.push('==城市==');
+  (DATA.cities||[]).forEach(function(c){ o.push(c.name+'|'+(c.note||'')); });
+  o.push('==开头==');
+  o.push((DATA.eyebrow||'')+'|'+(DATA.introTip||'')+'|'+(DATA.tlTitle||'')+'|'+(DATA.albumTitle||''));
+  return o.join('\n');
+}
+on('#eAllText','click',function(){
+  var box=$('#tlbox'); if(!box) return;
+  box.querySelector('.tb b').textContent='全部文字';
+  $('#tlboxText').value=buildAllText();
+  box.classList.add('on');
+});
+on('#addTl', 'click',function(){
+  DATA.timeline.push({day:'DAY '+(DATA.timeline.length+1),title:'',sub:''});
+  renderETl();
+});
+on('#addPhoto', 'click',function(){ $('#fileInput').click(); });
+
+on('#fileInput', 'change',function(e){
+  var files=Array.prototype.slice.call(e.target.files||[]);
+  e.target.value='';
+  if(!files.length) return;
+  toast('正在处理 '+files.length+' 张…');
+  var q=files.slice();
+  (function next(){
+    if(!q.length){ renderEThumbs(); persist(); toast('已加入 '+files.length+' 张'); return; }
+    var f=q.shift();
+    compress(f,function(uri){
+      if(uri){
+        DATA.photos.push({src:uri,note:''});
+      }
+      setTimeout(next,60);
+    });
+  })();
+});
+
+function compress(file,cb){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var maxW=900,maxH=1200;
+      var r=Math.min(maxW/img.width,maxH/img.height,1);
+      var w=Math.max(1,Math.round(img.width*r)),h=Math.max(1,Math.round(img.height*r));
+      var c=document.createElement('canvas');
+      c.width=w;c.height=h;
+      var g=c.getContext('2d');
+      g.fillStyle='#111';g.fillRect(0,0,w,h);
+      g.drawImage(img,0,0,w,h);
+      try{ cb(c.toDataURL('image/jpeg',0.82)); }catch(err){ cb(null); }
+    };
+    img.onerror=function(){ cb(null); };
+    img.src=ev.target.result;
+  };
+  reader.onerror=function(){ cb(null); };
+  reader.readAsDataURL(file);
+}
+
+var autoSaveTimer=null;
+function autoSave(){
+  if(autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(function(){
+    if(save()){ toast('已自动保存'); }
+  },700);
+}
+
+function persist(){
+  if(!save()) return;
+  renderAll();
+}
+function readEditor(){
+  if(!$('#editor')) return;
+  DATA.startDate=$('#fStart').value||DATA.startDate;
+  DATA.targetDay=Math.max(1,parseInt($('#fTarget').value,10)||600);
+  DATA.eyebrow=$('#fEyebrow').value;
+  DATA.introTip=$('#fIntroTip').value;
+  DATA.tlTitle=$('#fTlTitle').value;
+  DATA.albumTitle=$('#fAlbumTitle').value;
+  DATA.leadText=$('#fLeadText').value;
+  DATA.addText=$('#fAddText').value;
+  DATA.unitText=$('#fUnitText').value||'天';
+  DATA.cityTitle=$('#fCityTitle').value;
+  DATA.mapHint=$('#fMapHint').value;
+  DATA.endingText=$('#fEnding').value;
+  DATA.yesText=$('#fYesText').value||'要';
+  DATA.noText=$('#fNoText').value||'不要';
+  DATA.letter=$('#fLetter').value.split('\n').filter(function(s){return s.trim()!=='';});
+  DATA.sign=$('#fSign').value;
+  DATA.ask=$('#fAsk').value;
+  DATA.reply=$('#fReply').value;
+}
+on('#eSave', 'click',function(){
+  readEditor(); counted=false;
+  if(save()){ renderAll(); toast('已保存'); }
+});
+on('#eClose', 'click',function(){
+  hideEditor();
+});
+on('#eReset', 'click',function(){
+  if(!confirm('恢复默认内容？照片和文字都会清掉。')) return;
+  DATA=clone(DEF);
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  counted=false; fillEditor(); renderAll(); toast('已恢复默认');
+});
+
+function showEditor(){
+  if(editing||!$('#editor')) return;
+  editing=true;
+  $('#editor').classList.add('on');
+  document.body.style.overflow='hidden';
+  fillEditor();
+}
+function hideEditor(){
+  editing=false;
+  $('#editor').classList.remove('on');
+  document.body.style.overflow='';
+  readEditor();
+  if(save()){ renderAll(); }
+}
+window.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&editing) hideEditor();
+});
+
+/* 进入编辑：URL 带 #edit，或连点右上角 ♪ 5 次 */
+if(location.hash==='#edit'||/[?&]edit=1/.test(location.search)){
+  setTimeout(showEditor,400);
+}
+var taps=0,tapTimer=null;
+on('#mute', 'click',function(){
+  taps++;
+  if(tapTimer) clearTimeout(tapTimer);
+  tapTimer=setTimeout(function(){taps=0;},1800);
+  if(taps>=5){ taps=0; showEditor(); }
+});
+
+/* ---------- 导出 ---------- */
+on('#eExport', 'click',function(){
+  readEditor();
+  var html=buildExport();
+  var name='anniversary.html';
+  try{
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); },4000);
+    toast('已导出 '+(blob.size/1048576).toFixed(1)+'MB，去下载目录找');
+  }catch(e){
+    toast('导出失败，试试用 Chrome 打开');
+  }
+});
+
+function buildExport(){
+  var clone=document.documentElement.cloneNode(true);
+  var rm=function(sel){var el=clone.querySelector(sel); if(el&&el.parentNode) el.parentNode.removeChild(el);};
+  rm('#editor'); rm('#toast');
+  ['#tl','#album','#dots','#letter','#mapDots','#cityList'].forEach(function(s){
+    var el=clone.querySelector(s); if(el) el.innerHTML='';
+  });
+  Array.prototype.forEach.call(clone.querySelectorAll('.in'),function(el){el.classList.remove('in');});
+  Array.prototype.forEach.call(clone.querySelectorAll('.rv'),function(el){el.style.transitionDelay='';});
+  var seed=clone.querySelector('#seed');
+  if(seed){ seed.textContent=JSON.stringify(DATA).replace(/</g,'\\u003c'); }
+  var intro=clone.querySelector('#intro');
+  if(intro) intro.className='';
+  var body=clone.querySelector('body');
+  if(body) body.style.overflow='';
+  return '<!DOCTYPE html>\n'+clone.outerHTML;
+}
+
+/* ---------- 微信保护 ---------- */
+document.addEventListener('gesturestart',function(e){e.preventDefault();});
+document.body.addEventListener('touchmove',function(e){
+  if(e.touches.length>1) e.preventDefault();
+},{passive:false});
+
+
+/* ---- 时间锁：11-23 00:00 之前打不开 ---- */
+var UNLOCK_TS=new Date('2099-01-01T00:00:00+08:00').getTime();   /* 改成你要解锁的时间；留 2099 就是不锁 */
+var GATE_KEY='anniv_gate_open_1';
+var gateTimer=null;
+function pad2n(n){ return (n<10?'0':'')+n; }
+function unlockGate(silent){
+  var g=$('#gate');
+  if(g&&!g.classList.contains('gone')){
+    g.classList.add('gone');
+    setTimeout(function(){ if(g) g.style.display='none'; },1000);
+  }
+  if(gateTimer){ clearInterval(gateTimer); gateTimer=null; }
+  document.body.style.overflow='';
+}
+function tickGate(){
+  var left=UNLOCK_TS-Date.now();
+  if(left<=0){ unlockGate(); return; }
+  var h=Math.floor(left/3600000);
+  var m=Math.floor((left%3600000)/60000);
+  var sec=Math.floor((left%60000)/1000);
+  var el=$('#gateTime');
+  if(el) el.textContent=pad2n(h)+' : '+pad2n(m)+' : '+pad2n(sec);
+  var sub=$('#gateSub');
+  if(sub){
+    if(left<3600000) sub.textContent='就快了';
+    else if(left<86400000) sub.textContent='到今晚零点，自己打开';
+    else sub.textContent='到那天零点，自己打开';
+  }
+}
+function checkGate(){
+  var q=location.search||'';
+  if(/[?&]relock/.test(q)){ try{ localStorage.removeItem(GATE_KEY); }catch(e){} }
+  if(/[?&]open/.test(q)){ try{ localStorage.setItem(GATE_KEY,'1'); }catch(e){} }
+  var opened=false;
+  try{ opened=localStorage.getItem(GATE_KEY)==='1'; }catch(e){}
+  if(opened||Date.now()>=UNLOCK_TS){
+    unlockGate(true);
+    return;
+  }
+  document.body.style.overflow='hidden';
+  tickGate();
+  gateTimer=setInterval(tickGate,1000);
+  /* 连点时间数字 5 次也能开（后门） */
+  var taps=0,tt=null;
+  var el=$('#gateTime');
+  if(el){
+    el.addEventListener('click',function(){
+      taps++;
+      if(tt) clearTimeout(tt);
+      tt=setTimeout(function(){ taps=0; },1800);
+      if(taps>=5){
+        try{ localStorage.setItem(GATE_KEY,'1'); }catch(e){}
+        unlockGate();
+      }
+    });
+  }
+}
+
+/* ---------- 启动 ---------- */
+renderAll();
+envLoad();
+refreshEndNext();
+checkUnlock();
+checkGate();
+fillEditor();
+})();
+</script>
+</body>
+</html>
